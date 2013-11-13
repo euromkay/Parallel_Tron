@@ -6,9 +6,7 @@ FPS = pygame.time.Clock()
 
 class LightBike():
   def __init__(self, startloc, startvel):
-    # self.location = [[0,0], '']
     self.location = startloc
-    # self.location[1] = 'off'
     self.velocity = startvel
     self.color = color
   def movedown(self):

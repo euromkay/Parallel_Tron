@@ -4,6 +4,7 @@ from pygame.locals import *
 import socket, struct, threading, sys
 import cPickle, time
 from pprint import pprint
+# from helper import draw_logic, load_images, construct_list
 
 
 FULL_GRID_SIZE = (20, 10) # number of locations in full game 
