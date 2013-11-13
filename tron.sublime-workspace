@@ -1,0 +1,1202 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"pla",
+				"player2"
+			],
+			[
+				"p",
+				"posvec"
+			],
+			[
+				"pos",
+				"posvec"
+			],
+			[
+				"loc",
+				"loc_tuple"
+			],
+			[
+				"pl",
+				"player2"
+			],
+			[
+				"Gri",
+				"GRID_SIZEX"
+			],
+			[
+				"lo",
+				"location"
+			],
+			[
+				"play",
+				"player1"
+			],
+			[
+				"mo",
+				"movedown  (function)"
+			],
+			[
+				"plya",
+				"player2"
+			],
+			[
+				"mov",
+				"moveup  (function)"
+			],
+			[
+				"bik",
+				"bike_locx"
+			],
+			[
+				"bi",
+				"bike_locy"
+			],
+			[
+				"in",
+				"interpolation"
+			],
+			[
+				"edge",
+				"edge_arr"
+			],
+			[
+				"ed",
+				"edge_arr"
+			],
+			[
+				"im",
+				"image"
+			],
+			[
+				"conv",
+				"conv_im"
+			],
+			[
+				"co",
+				"conv_im"
+			],
+			[
+				"M",
+				"M"
+			],
+			[
+				"col",
+				"col_idx"
+			],
+			[
+				"th",
+				"thresh_im"
+			],
+			[
+				"con",
+				"conv_im"
+			],
+			[
+				"sm",
+				"same"
+			],
+			[
+				"Las",
+				"lastQueueInd"
+			],
+			[
+				"las",
+				"lastQueueInd"
+			],
+			[
+				"la",
+				"lastQueueInd"
+			],
+			[
+				"kes",
+				"keysOut"
+			],
+			[
+				"ke",
+				"keysOut"
+			],
+			[
+				"mid",
+				"midInB"
+			],
+			[
+				"mer",
+				"Merge"
+			],
+			[
+				"key",
+				"keysOut"
+			],
+			[
+				"keys",
+				"keysOut"
+			],
+			[
+				"num",
+				"num_mat"
+			],
+			[
+				"RGB",
+				"RGB_object"
+			],
+			[
+				"tiem",
+				"timetotal0"
+			],
+			[
+				"tim",
+				"timetotal1"
+			],
+			[
+				"recv",
+				"recvdata"
+			],
+			[
+				"picl",
+				"picklepack"
+			],
+			[
+				"log",
+				"logtimes"
+			],
+			[
+				"time",
+				"timetotal0"
+			],
+			[
+				"timeto",
+				"timetotal1"
+			],
+			[
+				"excp",
+				"except"
+			],
+			[
+				"rec",
+				"recv_sock"
+			],
+			[
+				"reci",
+				"receive_data"
+			],
+			[
+				"re",
+				"recv_sock"
+			],
+			[
+				"send",
+				"send_sock"
+			],
+			[
+				"rev",
+				"recv_sock"
+			],
+			[
+				"hos",
+				"host_sock"
+			],
+			[
+				"sock",
+				"socket"
+			],
+			[
+				"class",
+				"class_members"
+			],
+			[
+				"calss",
+				"class_members"
+			],
+			[
+				"div",
+				"divisor"
+			],
+			[
+				"find",
+				"find_node"
+			],
+			[
+				"c",
+				"count_divis_by"
+			],
+			[
+				"node",
+				"node"
+			],
+			[
+				"if",
+				"ifmain	if __name__ == '__main__'"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "tron_render.py",
+			"settings":
+			{
+				"buffer_size": 4468,
+				"line_ending": "Unix",
+				"name": "# tron render code"
+			}
+		},
+		{
+			"file": "/Users/ET/Google Drive/Dropbox/Pong_git/sandbox-pong/py-pong/main.py",
+			"settings":
+			{
+				"buffer_size": 3628,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/Users/ET/Google Drive/Dropbox/Pong_git/sandbox-pong/Pong Renders/pong_render.py",
+			"settings":
+			{
+				"buffer_size": 4755,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/ET/Google Drive/Dropbox/Previous Work/Work Summer 2013/Python Class/Not Space Invaders/main.py",
+			"settings":
+			{
+				"buffer_size": 4681,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "tron.py",
+			"settings":
+			{
+				"buffer_size": 3273,
+				"line_ending": "Unix",
+				"name": "loc = []"
+			}
+		},
+		{
+			"file": "tron_master.py",
+			"settings":
+			{
+				"buffer_size": 2330,
+				"line_ending": "Unix",
+				"name": "# tron master node"
+			}
+		},
+		{
+			"file": "Tron2/tron.py",
+			"settings":
+			{
+				"buffer_size": 19534,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 67.0,
+		"selected_items":
+		[
+			[
+				"remo",
+				"Package Control: Remove Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"in",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 602.0
+	},
+	"console":
+	{
+		"height": 305.0,
+		"history":
+		[
+			"import urllib.request,os; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); open(os.path.join(ipp, pf), 'wb').write(urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ','%20')).read())"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/ET/Google Drive/Dropbox/UCSD Things/CSE 120/Homework/pa2/proportional_scheduling_calc.py",
+		"/Users/ET/Library/Containers/com.apple.mail/Data/Library/Mail Downloads/canny.py",
+		"/Users/ET/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/Users/ET/Google Drive/Dropbox/UCSD Things/CSE 166/PA1/assignment_1.py",
+		"/Users/ET/Google Drive/Dropbox/UCSD Things/CSE 166/PA1/yeah.c",
+		"/Users/ET/Library/Containers/com.apple.mail/Data/Library/Mail Downloads/assignment_1.py",
+		"/private/var/folders/m4/djwpk7ts34z2h8vlv6pc9mm80000gn/T/011d5b02-11cc-4c39-84be-28a75ab21ce0/home/solaris/ieng9/cs120f/eparreir/pa2/mykernel2.c",
+		"/private/var/folders/m4/djwpk7ts34z2h8vlv6pc9mm80000gn/T/011d5b02-11cc-4c39-84be-28a75ab21ce0/home/solaris/ieng9/cs120f/eparreir/pa2/pa2b.c",
+		"/private/var/folders/m4/djwpk7ts34z2h8vlv6pc9mm80000gn/T/011d5b02-11cc-4c39-84be-28a75ab21ce0/home/solaris/ieng9/cs120f/eparreir/pa2/pa2.txt",
+		"/private/var/folders/m4/djwpk7ts34z2h8vlv6pc9mm80000gn/T/cad0369b-0a01-4b1a-a588-20e557ec310f/home/eparreir/Provided/Turnin/DECLARATION",
+		"/private/var/folders/m4/djwpk7ts34z2h8vlv6pc9mm80000gn/T/051042d3-88f6-4893-a205-d835483be17e/erikparreira.com/index.html",
+		"/Users/ET/Library/Containers/com.apple.mail/Data/Library/Mail Downloads/MergeSort.cpp",
+		"/private/var/folders/m4/djwpk7ts34z2h8vlv6pc9mm80000gn/T/6e7c9b4e-5ede-4356-bf52-cb735220fb4c/home/linux/ieng6/cs160f/eparreir/turnin/mSortDriver.cpp",
+		"/Users/ET/Google Drive/Dropbox/UCSD Things/CSE 160/Homework/HW1/mSortDriver.cpp",
+		"/private/var/folders/m4/djwpk7ts34z2h8vlv6pc9mm80000gn/T/b46e3a9c-e1d3-4603-8e1c-83347a010cbd/home/pi/Desktop/hybrid-life/pi3d/demos/res-test.txt",
+		"/Users/ET/Library/Application Support/Sublime Text 3/Packages/User/Main.sublime-menu",
+		"/Users/ET/Library/Application Support/Sublime Text 3/Packages/Package Control/Package Control.sublime-settings",
+		"/Users/ET/Library/Application Support/Sublime Text 3/Packages/Default/Default (OSX).sublime-keymap",
+		"/Users/ET/Google Drive/Dropbox/hybrid-life/pi3d/shaders/conway.vs",
+		"/Users/ET/Google Drive/Dropbox/hybrid-life/pi3d/shaders/conway.fs",
+		"/Users/ET/Google Drive/Dropbox/hybrid-life/README.md",
+		"/Users/ET/Google Drive/Dropbox/hybrid-life/pi3d/demos/MPIConway.py",
+		"/Users/ET/Google Drive/Dropbox/UCSD Things/CSE 160/Homework/HW1/cblock.h",
+		"/Users/ET/Google Drive/Dropbox/UCSD Things/CSE 160/Homework/HW1/cmdLine.cpp",
+		"/Users/ET/Google Drive/Dropbox/UCSD Things/CSE 160/Homework/HW1/DECLARATION",
+		"/Users/ET/Google Drive/Dropbox/UCSD Things/CSE 160/Homework/HW1/Makefile",
+		"/Users/ET/Google Drive/Dropbox/UCSD Things/CSE 160/Homework/HW1/MergeSort.cpp",
+		"/Users/ET/Google Drive/Dropbox/UCSD Things/CSE 160/Homework/HW1/runs.sh",
+		"/Users/ET/Google Drive/Dropbox/UCSD Things/CSE 160/Homework/HW1/teameval.txt",
+		"/Users/ET/Google Drive/Dropbox/UCSD Things/CSE 160/Homework/HW1/Timer.cpp",
+		"/Users/ET/Google Drive/Dropbox/UCSD Things/CSE 160/Homework/HW1/verify.cpp",
+		"/Users/ET/Google Drive/Dropbox/UCSD Things/CSE 160/Homework/HW1/batch-job.sh",
+		"/Users/ET/Google Drive/Dropbox/hybrid-life/pi3d/demos/socket_conway.py",
+		"/Volumes/NO NAME/Am I Smart.txt",
+		"/Users/ET/Google Drive/Dropbox/hybrid-life/pi3d/demos/Conway.py",
+		"/Users/ET/Google Drive/Dropbox/hybrid-life/run.py",
+		"/Users/ET/Google Drive/Dropbox/UCSD Things/Homework.txt",
+		"/Users/ET/Library/Application Support/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/Users/ET/Desktop/Subscriptions.opml",
+		"/Users/ET/Dropbox/Personal Notes/Simpsons watched.txt",
+		"/Users/ET/Library/Application Support/Sublime Text 3/Packages/User/Default (OSX).sublime-keymap",
+		"/Volumes/Malkazar/Legend of Kora xbox/Legend of Kora/The.Legend.Of.Korra.S02E02.1080p.WEB-DL.H264-PublicHD/Downloaded From PublicHD.SE.txt",
+		"/Users/ET/Dropbox/Personal Notes/Things I want to buy.txt",
+		"/Users/ET/Dropbox/PlainText/TODO.txt",
+		"/Users/ET/Dropbox/Notes on Teaching.txt",
+		"/Users/ET/Downloads/C++ Concurrency in Action Practical Multithreading/Paying Sites only.url",
+		"/Users/ET/Dropbox/Personal Notes/Names.txt",
+		"/Users/ET/Downloads/matlab_R2013a_student_maci64_installer/installer_input.txt",
+		"/Users/ET/Desktop/Not Space Invaders/step2.py",
+		"/Users/ET/Desktop/Not Space Invaders/main.py",
+		"/Users/ET/Desktop/Not Space Invaders/Building space invaders.txt",
+		"/Users/ET/Desktop/Not Space Invaders/step3.py",
+		"/Users/ET/Dropbox/repo/pygame/Bouncing_Ball/bouncing_ball.py",
+		"/Users/ET/Dropbox/repo/Hardware/RPi.GPIO event detection.py",
+		"/Users/ET/repo/Hardware/simple_switch.py",
+		"/Users/ET/repo/Hardware/list_of_lights.py",
+		"/Users/ET/repo/Hardware/crash_python.py",
+		"/Users/ET/repo/Hardware/Simple_Blink.py",
+		"/Users/ET/repo/Hardware/blinking light.py",
+		"/Users/ET/Dropbox/repo/Hardware/RPi.GPIO.py",
+		"/Users/ET/repo/pygame/PyBalls 2.0.1/pyballs 2.0.py",
+		"/Users/ET/repo/Hardware/RPi.GPIO.py",
+		"/Users/ET/repo/Linux Commands cheat sheets.txt",
+		"/Users/ET/repo/bouncing_ball.py",
+		"/Users/ET/repo/Pygame/python_games/inkspill.py",
+		"/Users/ET/Dropbox/Personal Notes/Stuff needed for teaching",
+		"/Users/ET/Downloads/Iron Man IV v1.2/readme.txt",
+		"/Users/ET/Dropbox/Personal Notes/Blog/It's irrelevant.txt",
+		"/Users/ET/Dropbox/binary.py",
+		"/Users/ET/Dropbox/README.txt"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"||",
+			"|| ",
+			"0",
+			"101",
+			"10",
+			"moveright",
+			"movedleft",
+			"loc",
+			"0",
+			"10",
+			"player1",
+			"or",
+			"event",
+			"player1",
+			"0",
+			"50",
+			"10",
+			"101",
+			"wire",
+			"filters",
+			"guasi",
+			"edge_arr",
+			"filter",
+			"same",
+			"flatten",
+			"imread",
+			"interpolation",
+			"2",
+			"thresh_im",
+			"thres_im",
+			"conv_im_copy",
+			"thresh_im",
+			"keysIn",
+			"ref",
+			"new_dir",
+			"LOGFILE",
+			"print",
+			"sys.argv[2]",
+			"MPI.",
+			"GPIO",
+			",",
+			"Lesson",
+			"lesson",
+			"Lesson",
+			"10"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "tron_render.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4468,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								548,
+								548
+							]
+						],
+						"settings":
+						{
+							"auto_name": "# tron render code",
+							"codeintel": true,
+							"codeintel_config":
+							{
+								"JavaScript":
+								{
+									"codeintel_max_recursive_dir_depth": 2,
+									"codeintel_scan_files_in_project": false,
+									"javascriptExtraPaths":
+									[
+									]
+								},
+								"PHP":
+								{
+									"codeintel_max_recursive_dir_depth": 5,
+									"codeintel_scan_files_in_project": false,
+									"phpExtraPaths":
+									[
+									]
+								},
+								"Python":
+								{
+									"env":
+									{
+									}
+								}
+							},
+							"codeintel_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_live": true,
+							"codeintel_live_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_max_recursive_dir_depth": 10,
+							"codeintel_scan_exclude_dir":
+							{
+								"JavaScript":
+								[
+									"/build/",
+									"/min/"
+								]
+							},
+							"codeintel_scan_files_in_project": true,
+							"codeintel_selected_catalogs":
+							[
+								"PyWin32",
+								"jQuery",
+								"Rails"
+							],
+							"codeintel_snippets": true,
+							"codeintel_syntax_map":
+							{
+								"Python Django": "Python"
+							},
+							"codeintel_tooltips": "popup",
+							"sublime_auto_complete": true,
+							"syntax": "Packages/Python/Python.tmLanguage"
+						},
+						"translation.x": 7.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "/Users/ET/Google Drive/Dropbox/Pong_git/sandbox-pong/py-pong/main.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3628,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1238,
+								1238
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 485.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 3,
+			"sheets":
+			[
+				{
+					"buffer": 2,
+					"file": "/Users/ET/Google Drive/Dropbox/Pong_git/sandbox-pong/Pong Renders/pong_render.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4755,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3598,
+								3598
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 449.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/Users/ET/Google Drive/Dropbox/Previous Work/Work Summer 2013/Python Class/Not Space Invaders/main.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4681,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1245,
+								1255
+							]
+						],
+						"settings":
+						{
+							"codeintel": true,
+							"codeintel_config":
+							{
+								"JavaScript":
+								{
+									"codeintel_max_recursive_dir_depth": 2,
+									"codeintel_scan_files_in_project": false,
+									"javascriptExtraPaths":
+									[
+									]
+								},
+								"PHP":
+								{
+									"codeintel_max_recursive_dir_depth": 5,
+									"codeintel_scan_files_in_project": false,
+									"phpExtraPaths":
+									[
+									]
+								},
+								"Python":
+								{
+									"env":
+									{
+									}
+								}
+							},
+							"codeintel_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_live": true,
+							"codeintel_live_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_max_recursive_dir_depth": 10,
+							"codeintel_scan_exclude_dir":
+							{
+								"JavaScript":
+								[
+									"/build/",
+									"/min/"
+								]
+							},
+							"codeintel_scan_files_in_project": true,
+							"codeintel_selected_catalogs":
+							[
+								"PyWin32",
+								"jQuery",
+								"Rails"
+							],
+							"codeintel_snippets": true,
+							"codeintel_syntax_map":
+							{
+								"Python Django": "Python"
+							},
+							"codeintel_tooltips": "popup",
+							"sublime_auto_complete": true,
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 415.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "tron.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3273,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								3273
+							]
+						],
+						"settings":
+						{
+							"auto_name": "loc = []",
+							"codeintel": true,
+							"codeintel_config":
+							{
+								"JavaScript":
+								{
+									"codeintel_max_recursive_dir_depth": 2,
+									"codeintel_scan_files_in_project": false,
+									"javascriptExtraPaths":
+									[
+									]
+								},
+								"PHP":
+								{
+									"codeintel_max_recursive_dir_depth": 5,
+									"codeintel_scan_files_in_project": false,
+									"phpExtraPaths":
+									[
+									]
+								},
+								"Python":
+								{
+									"env":
+									{
+									}
+								}
+							},
+							"codeintel_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_live": true,
+							"codeintel_live_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_max_recursive_dir_depth": 10,
+							"codeintel_scan_exclude_dir":
+							{
+								"JavaScript":
+								[
+									"/build/",
+									"/min/"
+								]
+							},
+							"codeintel_scan_files_in_project": true,
+							"codeintel_selected_catalogs":
+							[
+								"PyWin32",
+								"jQuery",
+								"Rails"
+							],
+							"codeintel_snippets": true,
+							"codeintel_syntax_map":
+							{
+								"Python Django": "Python"
+							},
+							"codeintel_tooltips": "popup",
+							"sublime_auto_complete": true,
+							"syntax": "Packages/Python/Python.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "tron_master.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2330,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								203,
+								203
+							]
+						],
+						"settings":
+						{
+							"auto_name": "# tron master node",
+							"codeintel": true,
+							"codeintel_config":
+							{
+								"JavaScript":
+								{
+									"codeintel_max_recursive_dir_depth": 2,
+									"codeintel_scan_files_in_project": false,
+									"javascriptExtraPaths":
+									[
+									]
+								},
+								"PHP":
+								{
+									"codeintel_max_recursive_dir_depth": 5,
+									"codeintel_scan_files_in_project": false,
+									"phpExtraPaths":
+									[
+									]
+								},
+								"Python":
+								{
+									"env":
+									{
+									}
+								}
+							},
+							"codeintel_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_live": true,
+							"codeintel_live_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_max_recursive_dir_depth": 10,
+							"codeintel_scan_exclude_dir":
+							{
+								"JavaScript":
+								[
+									"/build/",
+									"/min/"
+								]
+							},
+							"codeintel_scan_files_in_project": true,
+							"codeintel_selected_catalogs":
+							[
+								"PyWin32",
+								"jQuery",
+								"Rails"
+							],
+							"codeintel_snippets": true,
+							"codeintel_syntax_map":
+							{
+								"Python Django": "Python"
+							},
+							"codeintel_tooltips": "popup",
+							"sublime_auto_complete": true,
+							"syntax": "Packages/Python/Python.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "Tron2/tron.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 19534,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								564,
+								584
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 1.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.5,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 112.0
+	},
+	"project": "tron.sublime-project",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": false,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": false,
+	"side_bar_width": 128.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

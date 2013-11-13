@@ -1,0 +1,1 @@
+ps -ef | grep "python tron*" | awk '{print $2}' | xargs kill -9
