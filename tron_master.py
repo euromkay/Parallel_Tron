@@ -4,61 +4,42 @@ from pygame.locals import *
 import socket, struct, threading, sys
 import cPickle, time
 from pprint import pprint
-# from helper import draw_logic, load_images, construct_list
+from helper import draw_logic, load_images, construct_list
 
 
-FULL_GRID_SIZE = (20, 10) # number of locations in full game 
+MONITOR_GRIDX = 5 # width 
+MONITOR_GRIDY = 3 # height
+FULL_GRID_SIZE = (160, 60) # number of locations in full game 
 PLAYER1_START = [0, FULL_GRID_SIZE[1]/2]
 PLAYER2_START = [FULL_GRID_SIZE[0]-1, FULL_GRID_SIZE[1]/2]
-MONITOR_GRIDX = 2 # width 
-MONITOR_GRIDY = 1 # height
 SOCKET_DEL = '*ET*'
-
-
-def load_images():
-  image_dict = {}
-  image_dict['c_hd_rt'] = pygame.image.load('assets/comet_head.png').convert_alpha()
-  image_dict['c_hd_dn'] = pygame.transform.rotate(image_dict['c_hd_rt'], -90)
-  image_dict['c_hd_lf'] = pygame.transform.rotate(image_dict['c_hd_rt'], -180)
-  image_dict['c_hd_up'] = pygame.transform.rotate(image_dict['c_hd_rt'], -270)
-
-  image_dict['m_hd_rt'] = pygame.image.load('assets/meteor_head.png').convert_alpha()
-  image_dict['m_hd_dn'] = pygame.transform.rotate(image_dict['m_hd_rt'], -90)
-  image_dict['m_hd_lf'] = pygame.transform.rotate(image_dict['m_hd_rt'], -180)
-  image_dict['m_hd_up'] = pygame.transform.rotate(image_dict['m_hd_rt'], -270)
-
-  image_dict['c_md_hor_r'] = pygame.image.load('assets/comet_mid.png').convert_alpha()
-  image_dict['c_md_ver_u'] = pygame.transform.rotate(image_dict['c_md_hor_r'], 90)
-  image_dict['c_md_hor_l'] = pygame.transform.rotate(image_dict['c_md_hor_r'], 180)
-  image_dict['c_md_ver_d'] = pygame.transform.rotate(image_dict['c_md_hor_r'], 270)
-
-  image_dict['c_tl_hor'] = pygame.image.load('assets/comet_tail.png').convert_alpha()
-  image_dict['c_tl_ver'] = pygame.transform.rotate(image_dict['c_tl_hor'], 90)
-
-  image_dict['m_md_hor_r'] = pygame.image.load('assets/meteor_mid.png').convert_alpha()
-  image_dict['m_md_ver_u'] = pygame.transform.rotate(image_dict['m_md_hor_r'], 90)
-  image_dict['m_md_hor_l'] = pygame.transform.rotate(image_dict['m_md_hor_r'], 180)
-  image_dict['m_md_ver_d'] = pygame.transform.rotate(image_dict['m_md_hor_r'], 270)
-
-  image_dict['m_tl_hor'] = pygame.image.load('assets/meteor_tail.png').convert_alpha()
-  image_dict['m_tl_ver'] = pygame.transform.rotate(image_dict['m_tl_hor'], 90)
-
-  image_dict['m_co_ur'] = pygame.image.load('assets/meteor_corner.png').convert_alpha()
-  image_dict['m_co_lr'] = pygame.transform.rotate(image_dict['m_co_ur'], -90)
-  image_dict['m_co_ll'] = pygame.transform.rotate(image_dict['m_co_ur'], -180)
-  image_dict['m_co_ul'] = pygame.transform.rotate(image_dict['m_co_ur'], -270)
-
-  image_dict['c_co_ur'] = pygame.image.load('assets/comet_corner.png').convert_alpha()
-  image_dict['c_co_lr'] = pygame.transform.rotate(image_dict['c_co_ur'], -90)
-  image_dict['c_co_ll'] = pygame.transform.rotate(image_dict['c_co_ur'], -180)
-  image_dict['c_co_ul'] = pygame.transform.rotate(image_dict['c_co_ur'], -270)
+WIN_PAUSE = 3 # seconds
+SPEED = 1
+FPS = pygame.time.Clock()
+# LEVELS = {'1':30, '2': 40, '3':50}
+# END_MINUTES = 5
+NUM_OF_LEVELS = 11
+LEVEL_INC = .5
+LEVEL_MINUTES = []
+last = 0 
+for x in range(0, NUM_OF_LEVELS+1):
+  LEVEL_MINUTES.append(last)
+  last += LEVEL_INC
+# LEVEL_MINUTES = [0, .5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, END_MINUTES]
+LEVEL_TIMES = [x*1000*60 for x in LEVEL_MINUTES]
+LEVEL_SPEED = [x*5 for x in range(1,NUM_OF_LEVELS+2)]
+# [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60 ] # none since no speed when the game ends
+LEVEL_TUPLES = zip(LEVEL_TIMES, LEVEL_SPEED)
+LEVELS = dict(zip([x for x in range(1, NUM_OF_LEVELS+2)], LEVEL_TUPLES))
+END_TIME = LEVEL_TIMES[-1] * 60 * 1000 # minutes x seconds x miliseconds 
 
 class LightBike():
   def __init__(self, startloc, start_orient, startvel, last_key):
-    self.location = startloc
-    self.velocity = startvel
+    self.location = startloc[:]
+    self.velocity = startvel[:]
     self.orientation = start_orient
     self.last_key = last_key
+    self.score = 0
   def movedown(self):
     self.velocity[0] = 0
     self.velocity[1] = 1
@@ -71,247 +52,353 @@ class LightBike():
   def moveright(self):
     self.velocity[0] = 1
     self.velocity[1] = 0
-  def update(self):
+  def update(self): 
     self.location[0] += self.velocity[0]
-    self.location[1] += self.velocity[1]
+    self.location[1] += self.velocity[1] 
 
-def get_whole_packet(socket):
-  data = ''
-  while True:
-    data += socket.recv(4024)
-    split = data.split(SOCKET_DEL) # split at newline, as per our custom protocol
-    if len(split) != 2: # it should be 2 elements big if it got the whole message
-      pass
+class MasterTron(object):
+  """The class for the MasterTron node"""
+  def __init__(self):
+    pygame.init()
+    self.player1 = LightBike(PLAYER1_START, 'hor', [1,0], K_KP4)
+    self.player2 = LightBike(PLAYER2_START, 'hor', [-1,0], K_g)
+    self.new_game_score()
+    self.init_locations()
+    self.window = pygame.display.set_mode((20,20))
+    self.image_dict = load_images()
+    self.sock_list = [[ [] for y in range(MONITOR_GRIDY)] for x in range(MONITOR_GRIDX)]
+    ips = open('ip_list.txt', 'r')
+    ips.readline() #comment line
+    address = ips.readline().strip()
+    ip_list = []
+    while address:
+        ip_list.append(address)
+        address = ips.readline().strip()
+    idx = 0
+    for x in range(0, MONITOR_GRIDX):
+      for y in range(0, MONITOR_GRIDY):
+        self.sock_list[x][y] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock_list[x][y].connect((ip_list[idx], 20000))
+        idx += 1
+
+    # self.ip_list = [('localhost', 20000), ('localhost', 20001)]#, ('localhost', 20001)]
+    self.fliped_1x, self.fliped_1y, self.fliped_2x, self.fliped_2y = 4*[False]
+    self.flip_1x, self.flip_1y, self.flip_2x, self.flip_2y = 4*[False]
+    self.el_time = 0
+    self.current_level = 1
+
+  def run(self):
+    """loop to run the game and decide which state the game is in and call the 
+    functions accordingly"""
+    data = ''
+    while True:
+      if self.state == 'play':
+        data, self.state = self.play_frame()
+      elif self.state == 'win':
+        # need to send win signal, reset locations and pause 
+        self.win_signal(data)
+      elif self.state == 'draw':
+        self.win_signal('draw')
+      elif self.state == 'over':
+        self.game_over_signal(data)
+      self.el_time += FPS.tick(LEVELS[self.current_level][1])
+      # print self.el_time
+      # print LEVELS[self.current_level][0]
+      if self.el_time > LEVELS[self.current_level][0]:
+        if self.current_level == len(LEVELS):
+          print "exiting at " + str(self.el_time)
+          print "current level is " + str(self.current_level)
+          self.state = 'over'
+        self.current_level += 1
+
+  def play_frame(self):
+    self.handle_key_press()
+    self.last_2_loc_1 = self.last_loc_1[:]
+    self.last_loc_1[0] = [self.player1.location[0], self.player1.location[1]]
+    self.last_2_loc_2 = self.last_loc_2[:]
+    self.last_loc_2[0] = [self.player2.location[0], self.player2.location[1]]
+    self.player1.update()
+    self.player2.update()
+    player1_image_dict = draw_logic(self.last_2_loc_1, self.last_loc_1, self.player1,
+                                    self.fliped_1x, self.fliped_1y, 'c')
+    player2_image_dict = draw_logic(self.last_2_loc_2, self.last_loc_2, self.player2, 
+                                    self.fliped_2x, self.fliped_2y, 'm')
+    self.fliped_1x, self.fliped_1y = self.adjust_periodic(self.player1)
+    self.fliped_2x, self.fliped_2y = self.adjust_periodic(self.player2)
+    # flip_1x, flip_1y = self.adjust_periodic(self.player1)
+    # flip_2x, flip_2y = self.adjust_periodic(self.player2)
+    # if loc_collision(self.player1):
+    #   close_sockets(sock_list)
+    # if loc_collision(self.player2):
+    #   close_sockets(sock_list)
+
+    self.location[self.player1.location[0]][self.player1.location[1]] = 1
+    self.location[self.player2.location[0]][self.player2.location[1]] = 1
+    send_struct = {'player1_images': player1_image_dict,
+                'player2_images':player2_image_dict,
+                'player1_locs':[self.player1.location, self.last_loc_1[0], self.last_2_loc_1[0]],
+                'player2_locs':[self.player2.location, self.last_loc_2[0], self.last_2_loc_2[0]],
+                'state': 'play'}
+
+    data = cPickle.dumps(send_struct, cPickle.HIGHEST_PROTOCOL) + '*ET*'
+    for x in range(0, len(self.sock_list)):
+      for y in range(0, len(self.sock_list[x])):
+        self.sock_list[x][y].sendall(data)
+    return_list = []
+
+    for x in range(0, len(self.sock_list)):
+      for y in range(0, len(self.sock_list[x])):
+        return_list.append(self.get_whole_packet(self.sock_list[x][y]))
+
+    num_of_wins = 0
+    win_states = []
+    for data in return_list:
+      if data['state'] != 'play':
+        if data['state'] == 'draw':
+          # draw happend on the same screen
+          return data, 'draw'
+        if data['state'] == 'win':
+          num_of_wins += 1
+          win_states.append(data)
+          # return (data, 'win')
+    if num_of_wins > 1:
+      pprint(return_list)
+      print "NUM OF WINS IS LARGER THAN 1"
+      return win_states, 'draw'
+    elif num_of_wins == 1:
+      return (win_states[0], 'win')
+
+
+    if self.el_time > END_TIME:
+      return (data, 'over')
+
+    # return the state of the game
+    return (data, 'play')
+
+  def adjust_periodic(self, player):
+    """Allows for periodic edges. Returns whether or not you need to flip the 
+    corner piece."""
+    flipx = False
+    flipy = False
+    if player.location[0] >= FULL_GRID_SIZE[0]:
+      player.location[0] = 0
+      flipx = True
+    elif player.location[0] < 0: 
+      player.location[0] = FULL_GRID_SIZE[0] - 1
+      flipx = True
+    if player.location[1] >= FULL_GRID_SIZE[1]:
+      player.location[1] = 0
+      flipy = True
+    elif player.location[1] < 0: 
+      player.location[1] = FULL_GRID_SIZE[1] - 1
+      flipy = True
+    return flipx, flipy
+
+  def win_signal(self, data):
+    """players scored, increment the score and send the win signal to all the nodes
+    """
+    if data != 'draw':
+      # not a draw, check who won then.
+      if data['which'] == 1:
+        self.player1.score += 1
+      else:
+        self.player2.score += 1
     else:
-      x = cPickle.loads(split[0])
-      return x
+      print 'draw'
 
-def loc_collision(bike):
-  # check the location array to see if colided.
-  if bike.location[0] < 0 or bike.location[0] > FULL_GRID_SIZE[0]:
-    print "died of screen in x"
-    return True
-  if bike.location[1] < 0 or bike.location[1] > FULL_GRID_SIZE[1]:
-    print "died off screen in y"
-    return True
+    send_struct = {'state': 'win', 'score':{'p1':self.player1.score, 
+                                            'p2':self.player2.score}}
+    #send to worker nodes
+    data = cPickle.dumps(send_struct, cPickle.HIGHEST_PROTOCOL) + SOCKET_DEL                                       
+    for x in range(0, len(self.sock_list)):
+      for y in range(0, len(self.sock_list[x])):
+        self.sock_list[x][y].sendall(data)
 
-def close_sockets(sock_list):
-  kill_struct = {'kill_state': 1 }
-  kill_pickle = cPickle.dumps(kill_struct, cPickle.HIGHEST_PROTOCOL) + '*ET*'
-  for x in range(0, len(sock_list)):
-    for y in range(0, len(sock_list[x])):
-      sock_list[x][y].sendall(kill_pickle)
-      sock_list[x][y].shutdown(socket.SHUT_RDWR)
-      sock_list[x][y].close()
-  sys.exit()
-  
-def construct_list(last_2_loc, last_loc, head, middle, tail):
-  """logic for corner cases when drawing the corners. The case for 
-  when there is a corner followed by another corner. Lets the drawing nodes
-  know that the second to last location was also a corner so leave it unchagned"""
-  if last_loc[1] == 'cor':
-    return [head, middle, 'corner']
-  else:
-    return[head, middle, tail]
+    self.init_locations()
+    self.update_score_file()
+    time.sleep(WIN_PAUSE)
+    for x in range(0, len(self.sock_list)):
+      for y in range(0, len(self.sock_list[x])):
+        self.get_whole_packet(self.sock_list[x][y])
+    pygame.event.clear()
 
-def draw_logic(last_2_loc, last_loc, player, which):
-  """decides which images to tell the render nodes to draw"""
-  image_key_list = []
-  if last_loc[0][0] == player.location[0] and last_loc[0][0] == last_2_loc[0][0]:
-    # traveling vertically straight
-    if last_loc[0][1] > player.location[1]:
-      # traveling UP
-      image_key_list.append(which + '_hd_up')
-      image_key_list.append(which + '_md_ver_u')
-    else:
-      # traveling DOWN
-      image_key_list.append(which + '_hd_dn')
-      image_key_list.append(which + '_md_ver_d')
-    if last_2_loc[1] != 'cor':
-      # don't override corners for tail
-      image_key_list.append(which + '_tl_'+last_loc[1])
-    else: 
-      image_key_list.append('corner')
-    last_loc[1] = 'ver'
-    # player.orientation = 'ver'
-  elif last_loc[0][1] == player.location[1] and last_loc[0][1] == last_2_loc[0][1]:
-    # traveling horizontally straight
-    if last_loc[0][0] > player.location[0]:
-       # traveling left
-      image_key_list.append(which + '_hd_lf')
-      image_key_list.append(which + '_md_hor_l')
-    else:
-       # traveling right
-      image_key_list.append(which + '_hd_rt')
-      image_key_list.append(which + '_md_hor_r')
-    if last_2_loc[1] != 'cor':
-      # don't override corners for tail
-      image_key_list.append(which + '_tl_'+last_loc[1])
-    else:
-      # don't need to update corner drawing
-      image_key_list.append('corner')
-    last_loc[1] = 'hor' 
-  else:
-    #traveling the corners
-    print "here"
-    print "player.location = " + str(player.location) + "prev_loc = " + str(last_loc) + " last_2_loc = " + str(last_2_loc)
-    # at a corner, checking explicitly for the eight cases
-    if (player.location[0] == last_loc[0][0] and player.location[0] > last_2_loc[0][0]
-      and player.location[1] > last_loc[0][1] and player.location[1] > last_2_loc[0][1]):
-      #upper right, going down
-      image_key_list = construct_list(last_2_loc, last_loc, which + '_hd_dn', which + '_co_ur', which + '_tl_hor')
-      last_loc[1] = 'cor'
-    elif (player.location[0] < last_loc[0][0] and player.location[0] < last_2_loc[0][0]
-      and player.location[1] == last_loc[0][1] and player.location[1] < last_2_loc[0][1]):
-      #upper right, going left
-      image_key_list = construct_list(last_2_loc, last_loc, which + '_hd_lf', which + '_co_ur',which + '_tl_ver' )
-      last_loc[1] = 'cor'
+  def game_over_signal(self, data):
+    send_struct = {'state': 'over','score':{'p1':self.player1.score, 
+                                            'p2':self.player2.score}}
+    # data = cPickle.dumps(send_struct, cPickle.HIGHEST_PROTOCOL) + SOCKET_DEL                                       
+    self.handshake(send_struct)
+    reset = False
+    self.update_score_file()
 
-    elif (player.location[0] > last_loc[0][0] and player.location[0] > last_2_loc[0][0]
-      and player.location[1] == last_loc[0][1] and player.location[1] > last_2_loc[0][1]):
-      # lower left, going right
-      image_key_list = construct_list(last_2_loc, last_loc, which + '_hd_rt', which + '_co_ll',which + '_tl_ver' )
-      last_loc[1] = 'cor'
+    # wait for rest key. TODO, add a kill key
+    while not reset:
+      for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        if event.type == KEYDOWN:
+          if event.key == K_4:
+            reset = True
+    self.init_locations()
+    self.player1.score = 0
+    self.player2.score = 0
+    self.new_game_score()
+    for x in range(0, len(self.sock_list)):
+      for y in range(0, len(self.sock_list[x])):
+        self.sock_list[x][y].sendall('go' + SOCKET_DEL)
 
-    elif (player.location[0] == last_loc[0][0] and player.location[0] < last_2_loc[0][0]
-      and player.location[1] < last_loc[0][1] and player.location[1] < last_2_loc[0][1]):
-       # lower left, clockwise
-      image_key_list = construct_list(last_2_loc, last_loc, which + '_hd_up', which + '_co_ll',which + '_tl_hor' )
-      last_loc[1] = 'cor'
-       
-    elif (player.location[0] > last_loc[0][0] and player.location[0] > last_2_loc[0][0]
-      and player.location[1] == last_loc[0][1] and player.location[1] < last_2_loc[0][1]):
-      # upper left clockwise
-      image_key_list = construct_list(last_2_loc, last_loc, which + '_hd_rt', which + '_co_ul',which + '_tl_ver' )
-      last_loc[1] = 'cor'
-       
-    elif (player.location[0] == last_loc[0][0] and player.location[0] < last_2_loc[0][0]
-      and player.location[1] > last_loc[0][1] and player.location[1] > last_2_loc[0][1]):
-      # upper left counterclockwise
-      image_key_list = construct_list(last_2_loc, last_loc, which + '_hd_dn', which + '_co_ul',which + '_tl_hor' )
-      last_loc[1] = 'cor'
-       
-    elif (player.location[0] == last_loc[0][0] and player.location[0] > last_2_loc[0][0]
-      and player.location[1] < last_loc[0][1] and player.location[1] < last_2_loc[0][1]):
-      # lower right counterclockwise
-      image_key_list = construct_list(last_2_loc, last_loc, which + '_hd_up', which + '_co_lr',which + '_tl_hor' )
-      last_loc[1] = 'cor'
-       
-    elif (player.location[0] < last_loc[0][0] and player.location[0] < last_2_loc[0][0]
-      and player.location[1] == last_loc[0][1] and player.location[1] > last_2_loc[0][1]):
-      # lower right clockwise
-      image_key_list = construct_list(last_2_loc, last_loc, which + '_hd_lf', which + '_co_lr',which + '_tl_ver' )
-      last_loc[1] = 'cor'
-  return image_key_list
+    for x in range(0, len(self.sock_list)):
+      for y in range(0, len(self.sock_list[x])):
+        self.get_whole_packet(self.sock_list[x][y])
+    self.el_time = 0
+    self.current_level = 1
+    # reset the tick clock as fast as possible
+    FPS.tick(3000000)
+    # should be synced up for another game
 
-  
+  def new_game_score(self):
+    """appends the new players to the end of the score file"""
+    score_file = open('scores.txt', 'a')
+    last_line = 'player1 = 0 player2 = 0\n'
+    score_file.write(last_line)
+    score_file.close()
 
-grid = []
-if __name__ == '__main__':
-  pygame.init()
-  location = []
-  for x in range(0,FULL_GRID_SIZE[0] ):
-    location.append([])
-    for y in range(0,FULL_GRID_SIZE[1]):
-      location[x].append(0) # 0 
+  def update_score_file(self):
+    """overwrites the last line of the score file with the changed scores"""
+    score_file = open('scores.txt', 'rw+')
+    last_line = score_file.readlines()[-1]
+    # score_file.write(' '*len(last_line))
+    score_file.seek(-len(last_line), 2)
+    last_line = 'player1 = ' + str(self.player1.score) + ' player2 = ' + str(self.player2.score) + '\n'
+    score_file.write(last_line)
+    score_file.close()
 
-  player1 = LightBike(PLAYER1_START, 'hor', [1,0], K_LEFT)
-  player2 = LightBike(PLAYER2_START, 'hor', [-1,0], K_d)
-  last_loc_1 = [[-1, FULL_GRID_SIZE[1]/2], 'off'] # initilize off screen, shouldn't affect anythin
-  last_2_loc_1 = [[-2, FULL_GRID_SIZE[1]/2], 'off']
-  last_loc_2 = [[ FULL_GRID_SIZE[0], FULL_GRID_SIZE[1]/2] , 'off'] # initilize off screen, shouldn't affect anythin
-  last_2_loc_2 = [[FULL_GRID_SIZE[0]+1, FULL_GRID_SIZE[1]/2], 'off']
-  
-  window = pygame.display.set_mode((20,20))
-  image_dict = load_images()
-  sock_list = [[ [] for y in range(MONITOR_GRIDY)] for x in range(MONITOR_GRIDX)]
-  ip_list = [('localhost', 20000), ('localhost', 20001)]#, ('localhost', 20001)]
-  idx = 0
-  for x in range(0, MONITOR_GRIDX):
-    for y in range(0, MONITOR_GRIDY):
-      sock_list[x][y] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-      sock_list[x][y].connect(ip_list[idx])
-      idx += 1
-  while True:
-    # control block This will be the master node
-    # send_struct = {'player1move':'', 'player2move': '', new_loc:[0,0]} # clear it everytime
+  def handshake(self, data):
+    """Passes data to the nodes then waits for there response to keep synchronization.
+    The data is first pickled as a string then sent"""
+    data = cPickle.dumps(data, cPickle.HIGHEST_PROTOCOL) + SOCKET_DEL   
+    for x in range(0, len(self.sock_list)):
+      for y in range(0, len(self.sock_list[x])):
+        self.sock_list[x][y].sendall(data)
+
+    return_list = []
+    for x in range(0, len(self.sock_list)):
+      for y in range(0, len(self.sock_list[x])):
+        return_list.append(self.get_whole_packet(self.sock_list[x][y]))
+    return return_list
+
+
+
+  def handle_key_press(self):
+    """handles the pygame keyboard events."""
+    # bug that you can go back on yourself if you register a lot of button presses
+    p1_moved = False
+    p2_moved = False
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
           sys.exit()
       if event.type == KEYDOWN:
-        # check if trying to go back on them selves
-        if event.key == K_LEFT:
-          if player1.last_key != K_RIGHT and player1.last_key != K_LEFT:
-            player1.moveleft()
-            player1.last_key = K_LEFT
-        if event.key == K_RIGHT and player1.last_key != K_RIGHT:
-          if player1.last_key != K_LEFT:
-            player1.moveright()
-            player1.last_key = K_RIGHT
-        if event.key == K_UP and player1.last_key != K_UP:
-          if player1.last_key != K_DOWN:
-            player1.moveup()
-            player1.last_key = K_UP
-        if event.key == K_DOWN and player1.last_key != K_DOWN:
-          if player1.last_key != K_UP:
-            player1.movedown()
-            player1.last_key = K_DOWN
-        if event.key == K_a and player2.last_key != K_a:
-          if player2.last_key != K_d:
-            player2.moveleft()
-            player2.last_key = K_d
-        if event.key == K_d and player2.last_key != K_d:
-          if player2.last_key != K_a:
-            player2.moveright()
-            player2.last_key = K_a
-        if event.key == K_w and player2.last_key != K_w:
-          if player2.last_key != K_s:
-            player2.moveup()
-            player2.last_key = K_w
-        if event.key == K_s and player2.last_key != K_s:
-          if player2.last_key != K_w:
-            player2.movedown()
-            player2.last_key = K_s
+        # check if trying to go back on themselves
+        if event.key == K_KP4 and not p1_moved:
+          if self.player1.last_key != K_KP6 and self.player1.last_key != K_KP4:
+            self.player1.moveleft()
+            self.player1.last_key = K_KP4
+            p1_moved = True
+        if event.key == K_KP6 and self.player1.last_key != K_KP6 and not p1_moved:
+          if self.player1.last_key != K_KP4:
+            self.player1.moveright()
+            self.player1.last_key = K_KP6
+            p1_moved = True
+        if event.key == K_KP8 and self.player1.last_key != K_KP8 and not p1_moved:
+          if self.player1.last_key != K_KP2:
+            self.player1.moveup()
+            self.player1.last_key = K_KP8
+            p1_moved = True
+        if event.key == K_KP2 and self.player1.last_key != K_KP2 and not p1_moved:
+          if self.player1.last_key != K_KP8:
+            self.player1.movedown()
+            self.player1.last_key = K_KP2
+            p1_moved = True
+        if event.key == K_d and self.player2.last_key != K_d and not p2_moved:
+          if self.player2.last_key != K_g:
+            self.player2.moveleft()
+            self.player2.last_key = K_g
+            p2_moved = True
+        if event.key == K_g and self.player2.last_key != K_g and not p2_moved:
+          if self.player2.last_key != K_d:
+            self.player2.moveright()
+            self.player2.last_key = K_d
+            p2_moved = True
+        if event.key == K_r and self.player2.last_key != K_r and not p2_moved:
+          if self.player2.last_key != K_f:
+            self.player2.moveup()
+            self.player2.last_key = K_r
+            p2_moved = True
+        if event.key == K_f and self.player2.last_key != K_f and not p2_moved:
+          if self.player2.last_key != K_r:
+            self.player2.movedown()
+            self.player2.last_key = K_f
+            p2_moved = True
+        if event.key == K_2:
+          self.close_sockets(self.sock_list)
 
-    last_2_loc_1 = last_loc_1[:]
-    last_loc_1[0] = [player1.location[0], player1.location[1]]
-    last_2_loc_2 = last_loc_2[:]
-    last_loc_2[0] = [player2.location[0], player2.location[1]]
-    print last_loc_1
-    player1.update()
-    player2.update()
-    player1_image_dict = draw_logic(last_2_loc_1, last_loc_1, player1, 'c')
-    print last_loc_1[1]
-    player2_image_dict = draw_logic(last_2_loc_2, last_loc_2, player2, 'm')
-    # if loc_collision(player1):
-    #   close_sockets(sock_list)
-    # if loc_collision(player2):
-    #   close_sockets(sock_list)
 
-    location[player1.location[0]][player1.location[1]] = 1
-    location[player2.location[0]][player2.location[1]] = 1
-    send_struct = {'player1_images': player1_image_dict,
-                'player2_images':player2_image_dict,
-                'player1_locs':[player1.location, last_loc_1[0], last_2_loc_1[0]],
-                'player2_locs':[player2.location, last_loc_2[0], last_2_loc_2[0]],
-                'kill_state': 0}
-    print "printing send struct"
-    pprint(send_struct)
-    # print "printing the location varibles"
-    # print "player 1 currrent" + str(player1.location) + "player"
+  def get_whole_packet(self, socket):
+    """ensures that we receive the whole stream of data"""
+    data = ''
+    while True:
+      data += socket.recv(4024)
+      split = data.split(SOCKET_DEL) # split at newline, as per our custom protocol
+      if len(split) != 2: # it should be 2 elements big if it got the whole message
+        pass
+      else:
+        x = cPickle.loads(split[0])
+        return x
 
-    # make it so the render communicates the velocity vector and the of the position
-    # of the players. Pass the players to other nodes. 
-    data = cPickle.dumps(send_struct, cPickle.HIGHEST_PROTOCOL) + '*ET*'
+  # def loc_collision(bike):
+  #   # check the location array to see if colided.
+  #   if bike.location[0] < 0 or bike.location[0] > FULL_GRID_SIZE[0]:
+  #     print "died of screen in x"
+  #     return True
+  #   if bike.location[1] < 0 or bike.location[1] > FULL_GRID_SIZE[1]:
+  #     print "died off screen in y"
+  #     return True
+
+  def close_sockets(self, sock_list):
+    """kills and shutdown all the sockets. Despite adhering to exactly how it
+    should be done, seems to not work effectively"""
+    kill_struct = {'state': 'kill' }
+    kill_pickle = cPickle.dumps(kill_struct, cPickle.HIGHEST_PROTOCOL) + '*ET*'
     for x in range(0, len(sock_list)):
       for y in range(0, len(sock_list[x])):
-        sock_list[x][y].sendall(data)
-    state_list = []
-    # for x in range(0, len(sock_list)):
-    #   for y in range(0, len(sock_list[x])):
-    #     state_list.append(get_whole_packet(sock_list[x][y]))
+        sock_list[x][y].sendall(kill_pickle)
+        sock_list[x][y].shutdown(socket.SHUT_RDWR)
+        sock_list[x][y].close()
+    sys.exit()
 
-    # for idx, state in enumerate(state_list):
-    #   print state
-    time.sleep(1)
+  def init_locations(self):
+    """initilizes all of the location varibles and players"""
+    self.location = []
+    for x in range(0,FULL_GRID_SIZE[0] ):
+      self.location.append([])
+      for y in range(0,FULL_GRID_SIZE[1]):
+        self.location[x].append(0) # 0 
 
+    self.player1.location = PLAYER1_START[:]
+    self.player1.velocity = [1,0]
+    self.player1.orientation = 'hor'
+    self.player1.last_key = K_KP4    
+    self.player2.location = PLAYER2_START[:]
+    self.player2.velocity = [-1,0]
+    self.player2.orientation = 'hor'
+    self.player2.last_key = K_g
+
+    self.last_loc_1 = [[-1, FULL_GRID_SIZE[1]/2], 'off'] # initilize off screen, shouldn't affect anythin
+    self.last_2_loc_1 = [[-2, FULL_GRID_SIZE[1]/2], 'off']
+    self.last_loc_2 = [[ FULL_GRID_SIZE[0], FULL_GRID_SIZE[1]/2] , 'off'] # initilize off screen, shouldn't affect anythin
+    self.last_2_loc_2 = [[FULL_GRID_SIZE[0]+1, FULL_GRID_SIZE[1]/2], 'off']
+    self.state = 'play'
+  
+if __name__ == '__main__':
+  tron = MasterTron()
+  tron.run()
+  

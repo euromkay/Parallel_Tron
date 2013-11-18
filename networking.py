@@ -3,12 +3,25 @@ import SocketServer, struct, threading, socket
 import cPickle
 
 SOCKET_DEL = '*ET*' 
+LEFT_SCORE_TILE = [1,1]
+RIGHT_SCORE_TILE = [3,1]
 
 class NetworkGame(object):
   def __init__(self, tile):
     self.tile = tile
+    if tile[0] == LEFT_SCORE_TILE[0] and tile[1] == LEFT_SCORE_TILE[1]:
+      self.score_tile = True
+      self.player_score = 'p1'
+    elif tile[0] == RIGHT_SCORE_TILE[0] and tile[1] == RIGHT_SCORE_TILE[1]:
+      self.score_tile = True
+      self.player_score = 'p2'
+    else:
+      self.score_tile = False
 
   def update(self, data):
+    """override this method, only hook needed for the server"""
+    pass  
+  def clear(self, data):
     """override this method, only hook needed for the server"""
     pass
 
@@ -41,22 +54,19 @@ class Server():
 
   def recev_connection(self):
     # todo return something to know if time to quit
+    # print "getting whole packet"
     data = self.get_whole_packet()
+    # print "got whole packet"
     state_struct = self.process_request(data)
     self.sync(state_struct)
 
   def process_request(self, pickled_data):
       data = cPickle.loads(pickled_data)
       # print 'kill state' + str(data['kill_state'])
-      if data['kill_state'] == 1:
+      if data['state'] == 'kill':
         self.close_connection('died')
         sys.exit()
       struct = self.game.update(data)
-      if struct['state'] == 1:
-        self.close_connection(struct['msg'])
-        #print msg
-        print "TRYINT TO EXIT"
-        sys.exit()
       return struct
 
   def get_whole_packet(self):
@@ -75,4 +85,13 @@ class Server():
     x = cPickle.dumps(send_struct, cPickle.HIGHEST_PROTOCOL) + '*ET*'
     # print "at syning"
     self.open_sock.sendall( x )
+    if send_struct['state'] == 'over':
+      # clear screen and wait for handshake to proceed
+      data = self.get_whole_packet()
+      self.game.clear()
+      # once it recieves the signal to go, erase previous graphics
+      x = cPickle.dumps('go', cPickle.HIGHEST_PROTOCOL) + SOCKET_DEL
+      self.open_sock.sendall(x)
+
+
 

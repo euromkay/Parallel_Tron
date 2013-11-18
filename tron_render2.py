@@ -20,5 +20,5 @@ if __name__ == '__main__':
   server.open_connection()
   while True:
     server.recev_connection()
-    FPS.tick(1)
+    # FPS.tick(1)
 

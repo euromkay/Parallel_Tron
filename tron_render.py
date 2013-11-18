@@ -1,8 +1,9 @@
-# tron render code
+#!/usr/bin/env python
 import pygame
 import sys
-import network as n
-import Game
+import networking as n 
+import tron
+import socket
 
 FPS = pygame.time.Clock()
 # self.player1 = LightBike([0,0], [1,0], (255,0,0))
@@ -23,18 +24,22 @@ if __name__ == '__main__':
   yindx = int(yindx)
   print yindx
   print xindx
-  game = tron.Game([xindx, yindx])
+  first_hit = False
   for line in open('/etc/hosts').readlines():
     if line.find(myhostname) > -1:
       if first_hit:
         my_ip_address = line.split()[0]
       else:
         first_hit = True
-        
+
+  if yindx == 2:
+    yindx = 0
+  elif yindx == 0:
+    yindx = 2
+  game = tron.Game([xindx, yindx])
   print my_ip_address
-  server = n.server(my_ip_address, 20000, game )
+  server = n.Server(my_ip_address, 20000, game )
   server.open_connection()
   while True:
     server.recev_connection()
-    FPS.tick(5)
 
