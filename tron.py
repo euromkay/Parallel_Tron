@@ -7,6 +7,7 @@ from pprint import pprint
 FPS = pygame.time.Clock() 
 WIN_PAUSE = 3
 SCORE_SIZE = 500
+INFO_SIZE = 300
 
 class LightBike():
   def __init__(self, startloc, startvel):
@@ -21,7 +22,7 @@ class LightBike():
     self.velocity[1] = -1
   def moveleft(self):
     self.velocity[0] = -1
-    self.velocity[1] = 0 
+    self.velocity[1] = 0  
   def moveright(self):
     self.velocity[0] = 1 
     self.velocity[1] = 0
@@ -36,15 +37,17 @@ class Game(NetworkGame):
     super(Game, self).__init__(location)
     self.GRID_SIZEX = 32 # 
     self.GRID_SIZEY = 20
+    self.bezelx = 33
+    self.bezely = 21
     self.loc = []
-    for x in range(0,self.GRID_SIZEX ):
+    for x in range(0,self.bezelx ):
       self.loc.append([])
-      for y in range(0,self.GRID_SIZEY ):
+      for y in range(0,self.bezely ):
         self.loc[x].append(0) # 0 means not moved there yet
     print self.tile
     self.SCALE = 60
-    self.WIDTH = len(self.loc) * self.SCALE # scale the pixels from gridspace
-    self.HEIGHT = len(self.loc[0]) * self.SCALE
+    self.WIDTH = self.GRID_SIZEX * self.SCALE # scale the pixels from gridspace
+    self.HEIGHT = self.GRID_SIZEY * self.SCALE
     self.SIZE = (self.WIDTH, self.HEIGHT) 
     self.player1 = LightBike([0,0],  [1,0])
     self.player2 = LightBike([1,1], [-1,0])
@@ -53,9 +56,14 @@ class Game(NetworkGame):
     self.window = pygame.display.set_mode(self.SIZE)
     pygame.mouse.set_visible(False)
     self.image_dict = load_images()
-    self.background = pygame.image.load('/etc/py-pong/background.jpg').convert()
+    image_path = 'assets/backgrounds/Meteor_bkgrnd_10080-' + str(self.tile[0]) + '-' + str(self.tile[1]) + '.jpg'
+    self.background = pygame.image.load(image_path).convert()
     self.backPos = pygame.Rect((0, 0), (0, 0))
     self.window.blit(self.background, self.backPos)
+    self.p1_death_loc = [0,0]
+    self.p2_death_loc = [0,0]
+    self.p1_died = False
+    self.p2_died = False
 
   def update(self, data):
     # print "in update"
@@ -63,6 +71,8 @@ class Game(NetworkGame):
     if data['state'] == 'play':
       return self.play_state(data)
     elif data['state'] == 'win':
+      print self.player1.location
+      print self.player2.location
       return self.win_state(data)
     elif data['state'] == 'over':
       return self.game_over(data)
@@ -79,6 +89,8 @@ class Game(NetworkGame):
       if self.loc_collision(self.loc, self.player1):
       # will have to send to master node that there is a winner!
         player1hit = True
+        self.p1_death_loc = self.player1.location[:]
+        self.p1_died = True
         # print 'PLAYER 2 WINS'
         # data_struct = {'state': 'win', 'which':2}  
         # return data_struct
@@ -92,6 +104,8 @@ class Game(NetworkGame):
       if self.loc_collision(self.loc, self.player2):
       # will have to send to master node that there is a winner!
         player2hit = True
+        self.p2_death_loc = self.player2.location[:]
+        self.p2_died = True
         # print 'PLAYER 2 WINS'
         # data_struct = {'state': 'win', 'which':1}  
         # sys.exit()  
@@ -103,13 +117,17 @@ class Game(NetworkGame):
     # check for draw on same screen
     if player1hit and player2hit:
       print "DRAW"
-      data_struct = {'state': 'draw', 'which':'draw'}  
+      data_struct = {'state': 'draw', 'which':'draw', 
+                     'death_loc': [self.p1_death_loc, self.p2_death_loc],
+                     'tile': self.tile}  
       return data_struct
     if player1hit:
-      data_struct = {'state': 'win', 'which':2}  
+      data_struct = {'state': 'win', 'which':2, 'death_loc': [self.p1_death_loc],
+                     'tile': self.tile}  
       return data_struct
     if player2hit:
-      data_struct = {'state': 'win', 'which':1} 
+      data_struct = {'state': 'win', 'which':1, 'death_loc': [self.p2_death_loc],
+                     'tile': self.tile} 
       return data_struct 
 
     for idx in range(1, len(data['player1_locs'])):
@@ -130,6 +148,22 @@ class Game(NetworkGame):
 
   def win_state(self, data):
     # self.window.fill((0,0,0))
+    trans_death = []
+    for death in data['death_loc']:
+      # print "BEFORE TRANS" + str(death)
+      trans_death.append([death[0] - self.tile[0]*(self.bezelx),
+                          death[1] - (self.tile[1])*(self.bezely)])
+      # print "after" + str(trans_death[-1])
+    for idx in range(0,5):
+      for death in trans_death:
+        im_rect = self.image_dict['explode' + str(idx)].get_rect()
+        im_rect.centerx = death[0]*self.SCALE
+        im_rect.centery = death[1]*self.SCALE
+
+        self.window.blit(self.image_dict['explode' + str(idx)],im_rect)
+        pygame.display.flip()
+      time.sleep(.1)
+
     self.window.blit(self.background, self.backPos)
     if self.score_tile:
       font = pygame.font.Font(None, SCORE_SIZE)
@@ -139,12 +173,26 @@ class Game(NetworkGame):
       textpos.centerx = self.window.get_width()/2
       textpos.centery = self.window.get_height()/2
       self.window.blit(text, textpos)
+    if self.info_tile:
+      font = pygame.font.Font(None, INFO_SIZE)
+      el_time = str(data['time'])
+      el_time = font.render(el_time, 1, (0, 0, 255))
+      el_timepos = el_time.get_rect()
+      el_timepos.centerx = self.window.get_width()/2 
+      el_timepos.centery = self.window.get_height()/2 - INFO_SIZE
+      msg = str(data['msg'])
+      msg = font.render(msg, 1, (0, 0, 255))
+      msgpos = msg.get_rect()
+      msgpos.centerx = self.window.get_width()/2 
+      msgpos.centery = self.window.get_height()/2 + INFO_SIZE
+      self.window.blit(msg, msgpos)
+      self.window.blit(el_time, el_timepos)
     pygame.display.flip()
 
     self.loc = []
-    for x in range(0,self.GRID_SIZEX ):
+    for x in range( 0,self.bezelx ):
       self.loc.append([])
-      for y in range(0,self.GRID_SIZEY ):
+      for y in range( 0,self.bezely ):
         self.loc[x].append(0) # 0 means not moved there yet
     #display score for a bit
     time.sleep(WIN_PAUSE)
@@ -163,14 +211,14 @@ class Game(NetworkGame):
       text = font.render(score, 1, (0, 0, 255))
       textpos = text.get_rect()
       textpos.centerx = self.window.get_width()/2
-      textpos.centery = self.window.get_height()/2
+      textpos.centery = self.window.get_height()/2 
       self.window.blit(text, textpos)
     pygame.display.flip()
 
     self.loc = []
-    for x in range(0,self.GRID_SIZEX ):
-      self.loc.append([])
-      for y in range(0,self.GRID_SIZEY ):
+    for x in range(0,self.bezelx ):
+      self.loc.append([]) 
+      for y in range(0,self.bezely ):
         self.loc[x].append(0) # 0 means not moved there yet
     #display score for a bit
     # time.sleep(WIN_PAUSE)
@@ -187,6 +235,7 @@ class Game(NetworkGame):
   def loc_collision(self, loc, bike):
     if loc[bike.location[0]][bike.location[1]] == 1:
       print "location already occupied at " + str(bike.location[0]) + " " + str(bike.location[1])
+
       return True
     else:
       return False
@@ -196,23 +245,24 @@ class Game(NetworkGame):
     draws a black square first where it will be drawn"""
     x_cor = location[0]*self.SCALE
     y_cor = location[1]*self.SCALE
-    self.window.blit(self.background, (x_cor, y_cor),
-      pygame.Rect(x_cor, y_cor, self.SCALE, self.SCALE))
-    # pygame.draw.rect(self.window, (0,0,0), 
-    #                     (location[0]*self.SCALE, 
-    #                     location[1]*self.SCALE, 
-    #                     self.SCALE, self.SCALE))
-    self.window.blit(image, (location[0]*self.SCALE, location[1]*self.SCALE))
+    if not (x_cor > 1920 or y_cor > 1200):
+      self.window.blit(self.background, (x_cor, y_cor),
+        pygame.Rect(x_cor, y_cor, self.SCALE, self.SCALE))
+      # pygame.draw.rect(self.window, (0,0,0), 
+      #                     (location[0]*self.SCALE, 
+      #                     location[1]*self.SCALE, 
+      #                     self.SCALE, self.SCALE))
+      self.window.blit(image, (location[0]*self.SCALE, location[1]*self.SCALE))
 
   def translate_position(self, pos):
     """tanslates the entire game board to the local one"""
 
-    if (pos[0] < (self.tile[0]+1)*(self.GRID_SIZEX) and 
-        pos[0] >= self.tile[0]*(self.GRID_SIZEX) and 
-        pos[1] < (self.tile[1]+1)*(self.GRID_SIZEY) and 
-        pos[1] >= self.tile[1]*(self.GRID_SIZEY)):
-        translated_pos = [pos[0] - self.tile[0]*(self.GRID_SIZEX),
-                          pos[1] - (self.tile[1])*(self.GRID_SIZEY)] 
+    if (pos[0] < (self.tile[0]+1)*(self.bezelx) and 
+        pos[0] >= self.tile[0]*(self.bezelx) and 
+        pos[1] < (self.tile[1]+1)*(self.bezely) and 
+        pos[1] >= self.tile[1]*(self.bezely)):
+        translated_pos = [pos[0] - self.tile[0]*(self.bezelx),
+                          pos[1] - (self.tile[1])*(self.bezely)] 
         # print "player 1 trans at " + str(translated_pos_1)
     else: translated_pos = 0
     return translated_pos #, translated_pos_2)

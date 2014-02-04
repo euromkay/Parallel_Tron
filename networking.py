@@ -5,6 +5,7 @@ import cPickle
 SOCKET_DEL = '*ET*' 
 LEFT_SCORE_TILE = [1,1]
 RIGHT_SCORE_TILE = [3,1]
+INFO_TILE = [2,1]
 
 class NetworkGame(object):
   def __init__(self, tile):
@@ -17,6 +18,10 @@ class NetworkGame(object):
       self.player_score = 'p2'
     else:
       self.score_tile = False
+    if tile[0] == INFO_TILE[0] and tile[1] == INFO_TILE[1]:
+      self.info_tile = True
+    else:
+      self.info_tile = False
 
   def update(self, data):
     """override this method, only hook needed for the server"""
