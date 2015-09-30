@@ -18,7 +18,7 @@ if local:
 			Process(target = tron_render.display, args=[ip, port, x, y, scale, coords]).start()
 
 else:
-	ip = '10.10.0.10'
+	ip = '10.0.0.10'
 	port = 5000
 	scale = 30
 	name = platform.node()
