@@ -32,7 +32,7 @@ class LightBike():
 
 class Game(NetworkGame):
   """holds the Game class"""
-  def __init__(self, location):
+  def __init__(self, location, scale):
     """Initialize all the varibles"""
     super(Game, self).__init__(location)
     self.GRID_SIZEX = 32 # 
@@ -45,7 +45,7 @@ class Game(NetworkGame):
       for y in range(0,self.bezely ):
         self.loc[x].append(0) # 0 means not moved there yet
     print self.tile
-    self.SCALE = 60
+    self.SCALE = scale
     self.WIDTH = self.GRID_SIZEX * self.SCALE # scale the pixels from gridspace
     self.HEIGHT = self.GRID_SIZEY * self.SCALE
     self.SIZE = (self.WIDTH, self.HEIGHT) 

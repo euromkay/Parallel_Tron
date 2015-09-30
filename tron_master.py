@@ -9,6 +9,7 @@ from helper import draw_logic, load_images, construct_list
 
 MONITOR_GRIDX = 5 # width 
 MONITOR_GRIDY = 3 # height
+MONITORS_NUM = MONITOR_GRIDY * MONITOR_GRIDX
 FULL_GRID_SIZE = (165, 63) # number of locations in full game 
 WORKER_NODE_SIZE = (33,21)
 PLAYER1_START = [0, FULL_GRID_SIZE[1]/2]
@@ -56,7 +57,7 @@ class LightBike():
 
 class MasterTron(object):
   """The class for the MasterTron node"""
-  def __init__(self):
+  def __init__(self, ip, port):
     pygame.init()
     self.player1 = LightBike(PLAYER1_START, 'hor', [1,0], 'left' )
     self.player2 = LightBike(PLAYER2_START, 'hor', [-1,0], 'right' )
@@ -64,20 +65,18 @@ class MasterTron(object):
     self.init_locations()
     self.window = pygame.display.set_mode((20,20))
     self.image_dict = load_images()
-    self.sock_list = [[ [] for y in range(MONITOR_GRIDY)] for x in range(MONITOR_GRIDX)]
-    ips = open('ip_list.txt', 'r')
-    ips.readline() #comment line
-    address = ips.readline().strip()
-    ip_list = []
-    while address:
-        ip_list.append(address)
-        address = ips.readline().strip()
-    idx = 0
-    for x in range(0, MONITOR_GRIDX):
-      for y in range(0, MONITOR_GRIDY):
-        self.sock_list[x][y] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock_list[x][y].connect((ip_list[idx], 20000))
-        idx += 1
+    self.sock_list = []#[ [] for y in range(MONITOR_GRIDY)] for x in range(MONITOR_GRIDX)]
+
+
+    self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    self.socket.bind((ip, port))
+    self.socket.listen(MONITORS_NUM)
+
+    while len(self.sock_list) != 15:
+      open_sock, addr = self.socket.accept()
+      self.sock_list.append(open_sock)
+
+    
 
     # self.ip_list = [('localhost', 20000), ('localhost', 20001)]#, ('localhost', 20001)]
     self.fliped_1x, self.fliped_1y, self.fliped_2x, self.fliped_2y = 4*[False]
@@ -149,14 +148,13 @@ class MasterTron(object):
                 'state': 'play'}
 
     data = cPickle.dumps(send_struct, cPickle.HIGHEST_PROTOCOL) + '*ET*'
-    for x in range(0, len(self.sock_list)):
-      for y in range(0, len(self.sock_list[x])):
-        self.sock_list[x][y].sendall(data)
+
+    for s in self.sock_list:
+      s.sendall(data)
     return_list = []
 
-    for x in range(0, len(self.sock_list)):
-      for y in range(0, len(self.sock_list[x])):
-        return_list.append(self.get_whole_packet(self.sock_list[x][y]))
+    for s in self.sock_list:
+      return_list.append(self.get_whole_packet(s))
 
     num_of_wins = 0
     win_states = []
@@ -239,19 +237,18 @@ class MasterTron(object):
                    'score':{'p1':self.player1.score, 'p2':self.player2.score},
                    'time':real_time, 'msg':msg}
     #send to worker nodes
-    data = cPickle.dumps(send_struct, cPickle.HIGHEST_PROTOCOL) + SOCKET_DEL                                       
-    for x in range(0, len(self.sock_list)):
-      for y in range(0, len(self.sock_list[x])):
-        self.sock_list[x][y].sendall(data)
+    data = cPickle.dumps(send_struct, cPickle.HIGHEST_PROTOCOL) + SOCKET_DEL 
+    for s in self.sock_list:
+      s.sendall(data)
 
     # self.explode.play()
 
     self.init_locations()
     self.update_score_file()
     time.sleep(WIN_PAUSE)
-    for x in range(0, len(self.sock_list)):
-      for y in range(0, len(self.sock_list[x])):
-        self.get_whole_packet(self.sock_list[x][y])
+
+    for s in self.sock_list:
+      self.get_whole_packet(s)
     pygame.event.clear()
 
   def game_over_signal(self, data):
@@ -275,13 +272,11 @@ class MasterTron(object):
     self.player1.score = 0
     self.player2.score = 0
     self.new_game_score()
-    for x in range(0, len(self.sock_list)):
-      for y in range(0, len(self.sock_list[x])):
-        self.sock_list[x][y].sendall('go' + SOCKET_DEL)
+    for s in self.sock_list:
+      s.sendall('go' + SOCKET_DEL)
 
-    for x in range(0, len(self.sock_list)):
-      for y in range(0, len(self.sock_list[x])):
-        self.get_whole_packet(self.sock_list[x][y])
+    for s in self.sock_list:
+      self.get_whole_packet(s)
     self.el_time = 0
     self.current_level = 1
     # reset the tick clock as fast as possible
@@ -308,15 +303,13 @@ class MasterTron(object):
   def handshake(self, data):
     """Passes data to the nodes then waits for there response to keep synchronization.
     The data is first pickled as a string then sent"""
-    data = cPickle.dumps(data, cPickle.HIGHEST_PROTOCOL) + SOCKET_DEL   
-    for x in range(0, len(self.sock_list)):
-      for y in range(0, len(self.sock_list[x])):
-        self.sock_list[x][y].sendall(data)
+    data = cPickle.dumps(data, cPickle.HIGHEST_PROTOCOL) + SOCKET_DEL  
+    for s in self.sock_list:
+      s.sendall(data)
 
     return_list = []
-    for x in range(0, len(self.sock_list)):
-      for y in range(0, len(self.sock_list[x])):
-        return_list.append(self.get_whole_packet(self.sock_list[x][y]))
+    for s in self.sock_list:
+      return_list.append(self.get_whole_packet(self.sock_list[x][y]))
     return return_list
 
   def handle_joy_stick(self, events):
@@ -541,7 +534,7 @@ class MasterTron(object):
   #        if event.key == K_2:
   #          self.close_sockets(self.sock_list)
   
-if __name__ == '__main__':
-  tron = MasterTron()
+def start(ip, port):
+  tron = MasterTron(ip, port)
   tron.run()
   

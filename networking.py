@@ -41,16 +41,18 @@ class NetworkGame(object):
 
 class Server():
   amount_of_data = 81852
-  def __init__(self, ip_address, port, game):
+  def __init__(self, game):
     """Server class that handles dealing with requests"""
-    self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    self.socket.bind((ip_address, port))
+    self.open_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #self.socket.settimeout(1)
+    #self.socket.bind((ip_address, port))
     self.game = game # will handle giving data back to the game
 
-  def open_connection(self):
-    self.socket.listen(1)
-    self.open_sock, addr = self.socket.accept()
-    print "connection made to " + str(addr)
+  def open_connection(self, ip, port):
+    self.open_sock.connect( (ip, port) )
+    #self.socket.listen(15)
+    #self.open_sock, addr = self.socket.accept()
+    print "connection made to " + str(ip)
 
   def close_connection(self, msg):
     self.open_sock.sendall( msg )
