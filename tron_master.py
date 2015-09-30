@@ -309,7 +309,7 @@ class MasterTron(object):
 
     return_list = []
     for s in self.sock_list:
-      return_list.append(self.get_whole_packet(self.sock_list[x][y]))
+      return_list.append(self.get_whole_packet(s)
     return return_list
 
   def handle_joy_stick(self, events):
