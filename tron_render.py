@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import pygame
 import sys, os
-import networking as n 
+import networking 
 import tron
 import socket
 
@@ -15,8 +15,13 @@ FPS = pygame.time.Clock()
 
 # # change all of this to a game class
 def display(ip, port, x, y, scale, coords = None):
+  game = tron.Game([x, y], scale)
+
   if coords != None:
-    os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % coords
+    os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % ((game.WIDTH+10)*x, (game.HEIGHT+60)*y)
+    print (game.WIDTH*x, game.HEIGHT*y)
+
+  game = tron.Game([x, y], scale)
   # game = Game.Game() # initilize game and pygame
   # middleware = n.MiddleWare(game)
   # find which ip address to host on
@@ -24,8 +29,7 @@ def display(ip, port, x, y, scale, coords = None):
    # y = 0
   #elif y == 0:
    # y = 2
-  game = tron.Game([x, y], scale)
-  server = n.Server(game)
+  server = networking.Server(game)
   server.open_connection(ip, port)
   while True:
     server.recev_connection()

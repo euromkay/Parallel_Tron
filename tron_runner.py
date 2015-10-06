@@ -8,7 +8,7 @@ p = None
 if local:
 	ip = '0.0.0.0'
 	port = 5000
-	scale = 7
+	scale = 11
 
 	Process(target = tron_master.start, args = [ip, port]).start()
 	time.sleep(2)

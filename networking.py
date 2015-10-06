@@ -52,7 +52,6 @@ class Server():
     self.open_sock.connect( (ip, port) )
     #self.socket.listen(15)
     #self.open_sock, addr = self.socket.accept()
-    print "connection made to " + str(ip)
 
   def close_connection(self, msg):
     self.open_sock.sendall( msg )
@@ -61,17 +60,14 @@ class Server():
 
   def recev_connection(self):
     # todo return something to know if time to quit
-    # print "getting whole packet"
     data = self.get_whole_packet()
-    # print "got whole packet"
     state_struct = self.process_request(data)
     self.sync(state_struct)
 
   def process_request(self, pickled_data):
       data = cPickle.loads(pickled_data)
-      # print 'kill state' + str(data['kill_state'])
       if data['state'] == 'kill':
-        self.close_connection('died')
+        self.close_connection('de')
         sys.exit()
       struct = self.game.update(data)
       return struct

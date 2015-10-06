@@ -97,10 +97,10 @@ if __name__ == '__main__':
     if loc_collision(loc, player1):
       # will have to send to master node that there is a winner!
       print 'PLAYER 2 WINS'
-      sys.exit()
+      break;
     if loc_collision(loc, player2):
       print 'PLAYER 1 WINS'
-      sys.exit()
+      break;
 
     loc[player1.location[0]][player1.location[1]] = 1
     loc[player2.location[0]][player2.location[1]] = 1
@@ -111,3 +111,7 @@ if __name__ == '__main__':
     FPS.tick(20)
 
 
+pygame.display.quit()
+pygame.quit()
+print 'dead'
+sys.exit()

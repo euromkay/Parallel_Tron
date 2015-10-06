@@ -61,9 +61,9 @@ class MasterTron(object):
     pygame.init()
     self.player1 = LightBike(PLAYER1_START, 'hor', [1,0], 'left' )
     self.player2 = LightBike(PLAYER2_START, 'hor', [-1,0], 'right' )
-    self.new_game_score()
+    #self.new_game_score()
     self.init_locations()
-    self.window = pygame.display.set_mode((20,20))
+    self.window = pygame.display.set_mode((200,200))
     self.image_dict = load_images()
     self.sock_list = []#[ [] for y in range(MONITOR_GRIDY)] for x in range(MONITOR_GRIDX)]
 
@@ -118,8 +118,10 @@ class MasterTron(object):
 
   def play_frame(self):
     events = pygame.event.get()
+
     self.handle_key_press(events)
     self.handle_joy_stick(events)
+
     self.last_2_loc_1 = self.last_loc_1[:]
     self.last_loc_1[0] = [self.player1.location[0], self.player1.location[1]]
     self.last_2_loc_2 = self.last_loc_2[:]
@@ -130,14 +132,13 @@ class MasterTron(object):
                                     self.fliped_1x, self.fliped_1y, 'c')
     player2_image_dict = draw_logic(self.last_2_loc_2, self.last_loc_2, self.player2, 
                                     self.fliped_2x, self.fliped_2y, 'm')
-    self.fliped_1x, self.fliped_1y = self.adjust_periodic(self.player1)
-    self.fliped_2x, self.fliped_2y = self.adjust_periodic(self.player2)
-    # flip_1x, flip_1y = self.adjust_periodic(self.player1)
-    # flip_2x, flip_2y = self.adjust_periodic(self.player2)
-    # if loc_collision(self.player1):
-    #   close_sockets(sock_list)
-    # if loc_collision(self.player2):
-    #   close_sockets(sock_list)
+    if(self.fliped_1x or  self.fliped_1y or self.fliped_2x or self.fliped_2y):
+      print 'these are actually true'
+
+    self.fliped_1x, self.fliped_1y = self.wrap_around(self.player1)
+    self.fliped_2x, self.fliped_2y = self.wrap_around(self.player2)
+
+
 
     self.location[self.player1.location[0]][self.player1.location[1]] = 1
     self.location[self.player2.location[0]][self.player2.location[1]] = 1
@@ -182,7 +183,7 @@ class MasterTron(object):
     # return the state of the game
     return (data, 'play')
 
-  def adjust_periodic(self, player):
+  def wrap_around(self, player):
     """Allows for periodic edges. Returns whether or not you need to flip the 
     corner piece."""
     flipx = False
@@ -244,7 +245,7 @@ class MasterTron(object):
     # self.explode.play()
 
     self.init_locations()
-    self.update_score_file()
+    #self.update_score_file()
     time.sleep(WIN_PAUSE)
 
     for s in self.sock_list:
@@ -258,20 +259,17 @@ class MasterTron(object):
     # data = cPickle.dumps(send_struct, cPickle.HIGHEST_PROTOCOL) + SOCKET_DEL                                       
     self.handshake(send_struct)
     reset = False
-    self.update_score_file()
+    #self.update_score_file()
 
     # wait for rest key. TODO, add a kill key
     while not reset:
       for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
         if event.type == KEYDOWN:
           if event.key == K_4:
             reset = True
     self.init_locations()
     self.player1.score = 0
     self.player2.score = 0
-    self.new_game_score()
     for s in self.sock_list:
       s.sendall('go' + SOCKET_DEL)
 
@@ -283,22 +281,22 @@ class MasterTron(object):
     FPS.tick(3000000)
     # should be synced up for another game
 
-  def new_game_score(self):
-    """appends the new players to the end of the score file"""
-    score_file = open('scores.txt', 'a')
-    last_line = 'player1 = 0 player2 = 0\n'
-    score_file.write(last_line)
-    score_file.close()
+  #def new_game_score(self):
+    #"""appends the new players to the end of the score file"""
+    #score_file = open('scores.txt', 'a')
+    #last_line = 'player1 = 0 player2 = 0\n'
+    #score_file.write(last_line)
+    #score_file.close()
 
-  def update_score_file(self):
-    """overwrites the last line of the score file with the changed scores"""
-    score_file = open('scores.txt', 'rw+')
-    last_line = score_file.readlines()[-1]
+  #def update_score_file(self):
+    #"""overwrites the last line of the score file with the changed scores"""
+    #score_file = open('scores.txt', 'rw+')
+    #last_line = score_file.readlines()[-1]
     # score_file.write(' '*len(last_line))
-    score_file.seek(-len(last_line), 2)
-    last_line = 'player1 = ' + str(self.player1.score) + ' player2 = ' + str(self.player2.score) + '\n'
-    score_file.write(last_line)
-    score_file.close()
+    #score_file.seek(-len(last_line), 2)
+    #last_line = 'player1 = ' + str(self.player1.score) + ' player2 = ' + str(self.player2.score) + '\n'
+    #score_file.write(last_line)
+    #score_file.close()
 
   def handshake(self, data):
     """Passes data to the nodes then waits for there response to keep synchronization.
@@ -374,6 +372,8 @@ class MasterTron(object):
     p2_moved = False
     for event in events:
       if event.type == pygame.QUIT:
+          print 'quiting'
+          self.close_sockets(self.sock_list)
           sys.exit()
       if event.type == KEYDOWN:
         # check if trying to go back on themselves
@@ -417,8 +417,6 @@ class MasterTron(object):
             self.player2.movedown()
             self.player2.dir = 'down'
             p2_moved = True
-        if event.key == K_3:
-          self.close_sockets(self.sock_list)
 
   def get_whole_packet(self, socket):
     """ensures that we receive the whole stream of data"""
@@ -426,23 +424,19 @@ class MasterTron(object):
     while True:
       data += socket.recv(4024)
       split = data.split(SOCKET_DEL) # split at newline, as per our custom protocol
-      if len(split) != 2: # it should be 2 elements big if it got the whole message
-        pass
-      else:
-        x = cPickle.loads(split[0])
-        return x
+      if len(split) == 2: # it should be 2 elements big if it got the whole message
+        return cPickle.loads(split[0])
 
   def close_sockets(self, sock_list):
     """kills and shutdown all the sockets. Despite adhering to exactly how it
     should be done, seems to not work effectively"""
     kill_struct = {'state': 'kill' }
     kill_pickle = cPickle.dumps(kill_struct, cPickle.HIGHEST_PROTOCOL) + '*ET*'
-    for x in range(0, len(sock_list)):
-      for y in range(0, len(sock_list[x])):
-        sock_list[x][y].sendall(kill_pickle)
-        sock_list[x][y].shutdown(socket.SHUT_RDWR)
-        sock_list[x][y].close()
-    sys.exit()
+    for s in sock_list:
+        s.sendall(kill_pickle)
+        s.recv(2)
+        s.shutdown(socket.SHUT_RDWR)
+        s.close()
 
   def init_locations(self):
     """initilizes all of the location varibles and players"""
@@ -461,9 +455,12 @@ class MasterTron(object):
     self.player2.orientation = 'hor'
     self.player2.dir = 'left'
 
-    self.last_loc_1 = [[-1, FULL_GRID_SIZE[1]/2], 'off'] # initilize off screen, shouldn't affect anythin
+
+
+    self.last_loc_1   = [[-1, FULL_GRID_SIZE[1]/2], 'off'] # initilize off screen, shouldn't affect anythin
     self.last_2_loc_1 = [[-2, FULL_GRID_SIZE[1]/2], 'off']
-    self.last_loc_2 = [[ FULL_GRID_SIZE[0], FULL_GRID_SIZE[1]/2] , 'off'] # initilize off screen, shouldn't affect anythin
+
+    self.last_loc_2   = [[ FULL_GRID_SIZE[0], FULL_GRID_SIZE[1]/2] , 'off'] # initilize off screen, shouldn't affect anythin
     self.last_2_loc_2 = [[FULL_GRID_SIZE[0]+1, FULL_GRID_SIZE[1]/2], 'off']
     self.state = 'play'
 

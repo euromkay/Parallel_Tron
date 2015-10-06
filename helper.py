@@ -104,6 +104,7 @@ def draw_logic(last_2_loc, last_loc, player, flipx, flipy, which):
     if (player.location[0] == last_loc[0][0] and player.location[0] > last_2_loc[0][0]
       and player.location[1] > last_loc[0][1] and player.location[1] > last_2_loc[0][1]):
       #upper right, going down
+      print 'asdkltsda'
       if flipy or flipx:
         print "FLIPING!"
         image_key_list = construct_list(last_2_loc, last_loc, which + '_hd_dn', which + '_co_ll', which + '_tl_hor')

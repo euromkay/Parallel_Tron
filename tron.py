@@ -44,16 +44,15 @@ class Game(NetworkGame):
       self.loc.append([])
       for y in range(0,self.bezely ):
         self.loc[x].append(0) # 0 means not moved there yet
-    print self.tile
     self.SCALE = scale
     self.WIDTH = self.GRID_SIZEX * self.SCALE # scale the pixels from gridspace
     self.HEIGHT = self.GRID_SIZEY * self.SCALE
-    self.SIZE = (self.WIDTH, self.HEIGHT) 
+    SIZE = (self.WIDTH, self.HEIGHT) 
     self.player1 = LightBike([0,0],  [1,0])
     self.player2 = LightBike([1,1], [-1,0])
     self.score = {'p1':0, 'p2':0}
     pygame.init()
-    self.window = pygame.display.set_mode(self.SIZE)
+    self.window = pygame.display.set_mode(SIZE)
     pygame.mouse.set_visible(False)
     self.image_dict = load_images()
     image_path = 'assets/backgrounds/Meteor_bkgrnd_10080-' + str(self.tile[0]) + '-' + str(self.tile[1]) + '.jpg'
@@ -71,8 +70,8 @@ class Game(NetworkGame):
     if data['state'] == 'play':
       return self.play_state(data)
     elif data['state'] == 'win':
-      print self.player1.location
-      print self.player2.location
+      #print self.player1.location
+      #print self.player2.location
       return self.win_state(data)
     elif data['state'] == 'over':
       return self.game_over(data)
@@ -157,7 +156,7 @@ class Game(NetworkGame):
     for idx in range(0,5):
       for death in trans_death:
         im_rect = self.image_dict['explode' + str(idx)].get_rect()
-        im_rect.centerx = death[0]*self.SCALE
+        im_rect.centerx = dekath[0]*self.SCALE
         im_rect.centery = death[1]*self.SCALE
 
         self.window.blit(self.image_dict['explode' + str(idx)],im_rect)
