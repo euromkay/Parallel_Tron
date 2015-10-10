@@ -34,7 +34,7 @@ class Game(NetworkGame):
   """holds the Game class"""
   def __init__(self, location, scale, mode):
     """Initialize all the varibles"""
-    super(Game, self).__init__(location)
+    super(Game, self).__init__(location, mode)
     self.GRID_SIZEX = 32 # 
     self.GRID_SIZEY = 20
     self.bezelx = 33

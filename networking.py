@@ -8,7 +8,7 @@ RIGHT_SCORE_TILE = [3,1]
 INFO_TILE = [2,1]
 
 class NetworkGame(object):
-  def __init__(self, tile):
+  def __init__(self, tile, mode):
     self.tile = tile
     if tile[0] == LEFT_SCORE_TILE[0] and tile[1] == LEFT_SCORE_TILE[1]:
       self.score_tile = True
