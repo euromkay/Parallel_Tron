@@ -32,7 +32,7 @@ class LightBike():
 
 class Game(NetworkGame):
   """holds the Game class"""
-  def __init__(self, location, scale):
+  def __init__(self, location, scale, mode):
     """Initialize all the varibles"""
     super(Game, self).__init__(location)
     self.GRID_SIZEX = 32 # 
@@ -52,7 +52,7 @@ class Game(NetworkGame):
     self.player2 = LightBike([1,1], [-1,0])
     self.score = {'p1':0, 'p2':0}
     pygame.init()
-    self.window = pygame.display.set_mode(SIZE)
+    self.window = pygame.display.set_mode(SIZE, mode, 0)
     pygame.mouse.set_visible(False)
     self.image_dict = load_images()
     image_path = 'assets/backgrounds/Meteor_bkgrnd_10080-' + str(self.tile[0]) + '-' + str(self.tile[1]) + '.jpg'

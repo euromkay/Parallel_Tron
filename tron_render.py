@@ -17,11 +17,14 @@ FPS = pygame.time.Clock()
 def display(ip, port, x, y, scale, coords = None):
   game = tron.Game([x, y], scale)
 
+  mode = 0
   if coords != None:
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % ((game.WIDTH+10)*x, (game.HEIGHT+60)*y)
-    print (game.WIDTH*x, game.HEIGHT*y)
+    mode = pygame.NOFRAME
+  else:
+    mode = pygame.FULLSCREEN
 
-  game = tron.Game([x, y], scale)
+  game = tron.Game([x, y], scale, mode)
   # game = Game.Game() # initilize game and pygame
   # middleware = n.MiddleWare(game)
   # find which ip address to host on
