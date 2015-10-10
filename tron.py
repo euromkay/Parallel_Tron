@@ -156,7 +156,7 @@ class Game(NetworkGame):
     for idx in range(0,5):
       for death in trans_death:
         im_rect = self.image_dict['explode' + str(idx)].get_rect()
-        im_rect.centerx = dekath[0]*self.SCALE
+        im_rect.centerx = death[0]*self.SCALE
         im_rect.centery = death[1]*self.SCALE
 
         self.window.blit(self.image_dict['explode' + str(idx)],im_rect)
