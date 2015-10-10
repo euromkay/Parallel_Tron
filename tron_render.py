@@ -15,9 +15,9 @@ FPS = pygame.time.Clock()
 
 # # change all of this to a game class
 def display(ip, port, x, y, scale, coords = None):
-  game = tron.Game([x, y], scale)
-
   mode = 0
+  game = tron.Game([x, y], scale, mode)
+
   if coords != None:
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % ((game.WIDTH+10)*x, (game.HEIGHT+60)*y)
     mode = pygame.NOFRAME
