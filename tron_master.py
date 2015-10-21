@@ -78,22 +78,19 @@ class MasterTron(object):
       self.sock_list.append(open_sock)
 
     
-    pygame.mixer.pre_init(frequency=22050, size=-16, channels=2, buffer=2048)
+    pygame.mixer.pre_init(channels=2, buffer=512)
     pygame.mixer.init()
     self.mixer = pygame.mixer
 
-    # self.ip_list = [('localhost', 20000), ('localhost', 20001)]#, ('localhost', 20001)]
+    self.leftSound = self.mixer.Sound('assets/left.wav')
+    self.rightSound = self.mixer.Sound('assets/right.wav')
+    self.upSound = self.mixer.Sound('assets/up.wav')
+    self.downSound = self.mixer.Sound('assets/down.wav')
+
     self.fliped_1x, self.fliped_1y, self.fliped_2x, self.fliped_2y = 4*[False]
     self.flip_1x, self.flip_1y, self.flip_2x, self.flip_2y = 4*[False]
     self.el_time = 0
     self.current_level = 1
-    # pygame.mixer.init()
-    # pygame.mixer.music.set_volume(1.0)
-    # pygame.mixer.music.load("assets/backtrack.wav")
-    # pygame.mixer.music.play()
-    # self.explode = pygame.mixer.Sound('assets/explode.wav')
-    # self.backtrack = pygame.mixer.Sound('assets/backtrack.mp3')
-    # self.backtrack.play(-1)
 
 
   def run(self):
@@ -329,49 +326,49 @@ class MasterTron(object):
             self.player1.moveleft()
             self.player1.dir = 'left'
             p1_moved = True
-            sound.moveLeft(self.mixer)
+            sound.play(self.leftSound, self.player1)
         if event.key == K_KP6 and self.player1.dir != 'right' and not p1_moved:
           if self.player1.dir != 'left':
             self.player1.moveright()
             self.player1.dir = 'right'
             p1_moved = True
-            sound.moveRight(self.mixer)
+            sound.play(self.rightSound, self.player1)
         if event.key == K_KP8 and self.player1.dir != 'up' and not p1_moved:
           if self.player1.dir != 'down':
             self.player1.moveup()
             self.player1.dir = 'up'
             p1_moved = True
-            sound.moveUp(self.mixer)
+            sound.play(self.upSound, self.player1)
         if event.key == K_KP2 and self.player1.dir != 'down' and not p1_moved:
           if self.player1.dir != 'up':
             self.player1.movedown()
             self.player1.dir = 'down'
             p1_moved = True
-            sound.moveDown(self.mixer)
+            sound.play(self.downSound, self.player1)
         if event.key == K_d and self.player2.dir != 'left' and not p2_moved:
           if self.player2.dir != 'right':
             self.player2.moveleft()
             self.player2.dir = 'left'
             p2_moved = True
-            sound.moveLeft(self.mixer)
+            sound.play(self.leftSound, self.player2)
         if event.key == K_g and self.player2.dir != 'right' and not p2_moved:
           if self.player2.dir != 'left':
             self.player2.moveright()
             self.player2.dir = 'right'
             p2_moved = True
-            sound.moveRight(self.mixer)
+            sound.play(self.rightSound, self.player2)
         if event.key == K_r and self.player2.dir != 'up' and not p2_moved:
           if self.player2.dir != 'down':
             self.player2.moveup()
             self.player2.dir = 'up'
             p2_moved = True
-            sound.moveUp(self.mixer)
+            sound.play(self.upSound, self.player2)
         if event.key == K_f and self.player2.dir != 'down' and not p2_moved:
           if self.player2.dir != 'up':
             self.player2.movedown()
             self.player2.dir = 'down'
             p2_moved = True
-            sound.moveDown(self.mixer)
+            sound.play(self.downSound, self.player2)
         # if event.key == K_2:
           # self.close_sockets(self.sock_list)
         if event.key == K_4:

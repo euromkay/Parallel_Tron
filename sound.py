@@ -1,20 +1,4 @@
-import threading
-
-def moveUp(mixer):
-	threading.Thread(target = play, args = [mixer]).start()
-	
-
-def moveDown(mixer):
-	threading.Thread(target = play, args = [mixer]).start()
-
-
-def moveLeft(mixer):
-	threading.Thread(target = play, args = [mixer]).start()
-
-def moveRight(mixer):
-	threading.Thread(target = play, args = [mixer]).start()
-
-def play(mixer):
-  sound = './assets/changedirec.wav'
-  mixer.music.load(sound)
-  mixer.music.play()
+def play(sound, player):
+	channel = sound.play()
+	pos = player.location[0]/165.0
+	channel.set_volume(pos, 1-pos)
