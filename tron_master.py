@@ -82,10 +82,11 @@ class MasterTron(object):
     pygame.mixer.init()
     self.mixer = pygame.mixer
 
-    self.leftSound = self.mixer.Sound('assets/left.wav')
-    self.rightSound = self.mixer.Sound('assets/right.wav')
-    self.upSound = self.mixer.Sound('assets/up.wav')
-    self.downSound = self.mixer.Sound('assets/down.wav')
+    direc = '/home/shared/Parallel_Tron/'
+    self.leftSound = self.mixer.Sound(direc+'assets/left.wav')
+    self.rightSound = self.mixer.Sound(direc+'assets/right.wav')
+    self.upSound = self.mixer.Sound(direc+'assets/up.wav')
+    self.downSound = self.mixer.Sound(direc+'assets/down.wav')
 
     self.fliped_1x, self.fliped_1y, self.fliped_2x, self.fliped_2y = 4*[False]
     self.flip_1x, self.flip_1y, self.flip_2x, self.flip_2y = 4*[False]
