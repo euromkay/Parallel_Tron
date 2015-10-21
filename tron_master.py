@@ -87,6 +87,10 @@ class MasterTron(object):
     self.rightSound = self.mixer.Sound(direc+'assets/right.wav')
     self.upSound = self.mixer.Sound(direc+'assets/up.wav')
     self.downSound = self.mixer.Sound(direc+'assets/down.wav')
+    self.explode = self.mixer.Sound(direc+'assets/explode.wav')
+
+    cycle = self.mixer.Sound(direc+'assets/cycle.wav')
+    cycle.play(loops = -1, maxtime = 0, fade_ms = 0)
 
     self.fliped_1x, self.fliped_1y, self.fliped_2x, self.fliped_2y = 4*[False]
     self.flip_1x, self.flip_1y, self.flip_2x, self.flip_2y = 4*[False]
@@ -163,6 +167,7 @@ class MasterTron(object):
     win_states = []
     for data in return_list:
       if data['state'] != 'play':
+        self.explode.play(loops = 0, maxtime = 0, fade_ms = 0)
         if data['state'] == 'draw':
           # draw happend on the same screen
           print 'drew'
