@@ -114,7 +114,7 @@ class Game(NetworkGame):
         self.draw(self.player2.location, self.image_dict[data['player2_images'][0]])
 
     # check for draw on same screen
-    if player1hit and player2hit:
+    if (head_pos_1 != 0 and head_pos_1 == head_pos_2) or (player2hit and player1hit) :
       print "DRAW"
       data_struct = {'state': 'draw', 'which':'draw', 
                      'death_loc': [self.p1_death_loc, self.p2_death_loc],
