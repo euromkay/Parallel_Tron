@@ -59,6 +59,7 @@ class LightBike():
 class MasterTron(object):
   """The class for the MasterTron node"""
   def __init__(self, ip, port):
+    pygame.mixer.pre_init(channels=2, buffer=512)
     pygame.init()
     self.player1 = LightBike(PLAYER1_START, 'hor', [1,0], 'left' )
     self.player2 = LightBike(PLAYER2_START, 'hor', [-1,0], 'right' )
@@ -78,9 +79,7 @@ class MasterTron(object):
       self.sock_list.append(open_sock)
 
     
-    pygame.mixer.pre_init(channels=2, buffer=512)
     pygame.mixer.init()
-    self.mixer = pygame.mixer
 
     direc = '/home/shared/Parallel_Tron/'
     self.leftSound = self.mixer.Sound(direc+'assets/left.wav')
