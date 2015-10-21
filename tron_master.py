@@ -81,6 +81,7 @@ class MasterTron(object):
     
     pygame.mixer.init()
 
+    self.mixer = pygame.mixer
     direc = '/home/shared/Parallel_Tron/'
     self.leftSound = self.mixer.Sound(direc+'assets/left.wav')
     self.rightSound = self.mixer.Sound(direc+'assets/right.wav')
