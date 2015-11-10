@@ -138,8 +138,7 @@ class MasterTron(object):
                                     self.fliped_1x, self.fliped_1y, 'c')
     player2_image_dict = draw_logic(self.last_2_loc_2, self.last_loc_2, self.player2, 
                                     self.fliped_2x, self.fliped_2y, 'm')
-    if(self.fliped_1x or  self.fliped_1y or self.fliped_2x or self.fliped_2y):
-      print 'these are actually true'
+
 
     self.fliped_1x, self.fliped_1y = self.wrap_around(self.player1)
     self.fliped_2x, self.fliped_2y = self.wrap_around(self.player2)
@@ -213,7 +212,7 @@ class MasterTron(object):
     """players scored, increment the score and send the win signal to all the nodes
     """
     explod_loc_list = []
-    if isinstance(data, dict):
+    if isinstance(data, dict) and data['which'] != 'draw':
       # not a draw, check who won then.
       if data['which'] == 1:
         self.player1.score += 1
@@ -229,8 +228,10 @@ class MasterTron(object):
 
     else:
       # it's a list of states so there was a draw
-      print 'draw'
+      print 'this'
       msg = 'DRAW!'
+      if type(data) is not list:
+        data = [data]
       for x in data:
         for loc in x['death_loc']:
           explod_loc_list.append(self.convert_to_global(x['tile'],loc))

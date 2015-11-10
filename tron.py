@@ -6,8 +6,8 @@ from helper import load_images
 from pprint import pprint
 FPS = pygame.time.Clock() 
 WIN_PAUSE = 3
-SCORE_SIZE = 500
-INFO_SIZE = 300
+SCORE_SIZE = 16
+INFO_SIZE = 10
 
 class LightBike():
   def __init__(self, startloc, startvel):
@@ -56,7 +56,9 @@ class Game(NetworkGame):
     pygame.mouse.set_visible(False)
     self.image_dict = load_images()
     image_path = 'assets/backgrounds/Meteor_bkgrnd_10080-' + str(self.tile[0]) + '-' + str(self.tile[1]) + '.jpg'
-    self.background = pygame.image.load(image_path).convert()
+    self.background = pygame.image.load(image_path)
+    self.background = pygame.transform.scale(self.background, SIZE)
+    self.background = self.background.convert()
     self.backPos = pygame.Rect((0, 0), (0, 0))
     self.window.blit(self.background, self.backPos)
     self.p1_death_loc = [0,0]
@@ -82,6 +84,20 @@ class Game(NetworkGame):
     head_pos_2 = self.translate_position(data['player2_locs'][0])
     player1hit = False
     player2hit = False
+
+    if head_pos_1 == head_pos_2 and head_pos_1 != 0:
+      self.player2.location = head_pos_2
+      self.player1.location = head_pos_1
+      self.p1_death_loc = self.player1.location[:]
+      self.p2_death_loc = self.player2.location[:]
+      self.p1_died = True
+      self.p2_died = True
+      #print "DRAW!"
+      data_struct = {'state': 'draw', 'which':'draw', 
+                     'death_loc': [self.p1_death_loc, self.p2_death_loc],
+                     'tile': self.tile}  
+      return data_struct
+
     if head_pos_1 != 0:
       # print head_pos_1
       self.player1.location = head_pos_1
@@ -114,8 +130,10 @@ class Game(NetworkGame):
         self.draw(self.player2.location, self.image_dict[data['player2_images'][0]])
 
     # check for draw on same screen
-    if (head_pos_1 != 0 and head_pos_1 == head_pos_2) or (player2hit and player1hit) :
-      print "DRAW"
+    if player1hit and player2hit:
+      
+    #if (head_pos_1 != 0 and head_pos_1 == head_pos_2) or (player2hit and player1hit) :
+      #print "DRAW"
       data_struct = {'state': 'draw', 'which':'draw', 
                      'death_loc': [self.p1_death_loc, self.p2_death_loc],
                      'tile': self.tile}  
@@ -165,25 +183,29 @@ class Game(NetworkGame):
 
     self.window.blit(self.background, self.backPos)
     if self.score_tile:
-      font = pygame.font.Font(None, SCORE_SIZE)
+      font = pygame.font.Font(None, SCORE_SIZE * self.SCALE)
       score = str(data['score'][self.player_score])
-      text = font.render(score, 1, (0, 0, 255))
+      if self.player_score == 'p1':
+        color = 0, 0, 255
+      else:
+        color = 255, 0, 0
+      text = font.render(score, 1, color)
       textpos = text.get_rect()
       textpos.centerx = self.window.get_width()/2
       textpos.centery = self.window.get_height()/2
       self.window.blit(text, textpos)
     if self.info_tile:
-      font = pygame.font.Font(None, INFO_SIZE)
+      font = pygame.font.Font(None, INFO_SIZE * self.SCALE)
       el_time = str(data['time'])
       el_time = font.render(el_time, 1, (0, 0, 255))
       el_timepos = el_time.get_rect()
       el_timepos.centerx = self.window.get_width()/2 
-      el_timepos.centery = self.window.get_height()/2 - INFO_SIZE
+      el_timepos.centery = self.window.get_height()/2 - (INFO_SIZE * self.SCALE)
       msg = str(data['msg'])
       msg = font.render(msg, 1, (0, 0, 255))
       msgpos = msg.get_rect()
       msgpos.centerx = self.window.get_width()/2 
-      msgpos.centery = self.window.get_height()/2 + INFO_SIZE
+      msgpos.centery = self.window.get_height()/2 + (INFO_SIZE * self.SCALE)
       self.window.blit(msg, msgpos)
       self.window.blit(el_time, el_timepos)
     pygame.display.flip()
@@ -195,8 +217,10 @@ class Game(NetworkGame):
         self.loc[x].append(0) # 0 means not moved there yet
     #display score for a bit
     time.sleep(WIN_PAUSE)
+    
     # self.window.fill((0,0,0))
     self.window.blit(self.background, self.backPos)
+    
     pygame.display.flip()
 
     return  {'state': 'play'}  
@@ -205,7 +229,7 @@ class Game(NetworkGame):
     # self.window.fill((0,0,0))
     self.window.blit(self.background, self.backPos)
     if self.score_tile:
-      font = pygame.font.Font(None, SCORE_SIZE)
+      font = pygame.font.Font(None, SCORE_SIZE * self.SCALE)
       score = str(data['score'][self.player_score])
       text = font.render(score, 1, (0, 0, 255))
       textpos = text.get_rect()
