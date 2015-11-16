@@ -55,7 +55,7 @@ class Game(NetworkGame):
     self.window = pygame.display.set_mode(SIZE, mode, 0)
     pygame.mouse.set_visible(False)
     self.image_dict = load_images()
-    image_path = 'assets/backgrounds/Meteor_bkgrnd_10080-' + str(self.tile[0]) + '-' + str(self.tile[1]) + '.jpg'
+    image_path = 'assets/backgrounds/' + str(self.tile[0]) + '-' + str(self.tile[1]) + '.jpg'
     self.background = pygame.image.load(image_path)
     self.background = pygame.transform.scale(self.background, SIZE)
     self.background = self.background.convert()
