@@ -7,7 +7,7 @@ from pprint import pprint
 FPS = pygame.time.Clock() 
 WIN_PAUSE = 3
 SCORE_SIZE = 16
-INFO_SIZE = 10
+INFO_SIZE = 5
 
 class LightBike():
   def __init__(self, startloc, startvel):
@@ -85,6 +85,9 @@ class Game(NetworkGame):
     player1hit = False
     player2hit = False
 
+    if self.info_tile:
+      self.time = data['time']
+
     if head_pos_1 == head_pos_2 and head_pos_1 != 0:
       self.player2.location = head_pos_2
       self.player1.location = head_pos_1
@@ -159,7 +162,14 @@ class Game(NetworkGame):
       if temp != 0 and data['player2_images'][idx] != 'corner':
         self.draw(temp, self.image_dict[data['player2_images'][idx]]) 
 
+    ##if self.info_tile:
+      #self.drawTime(self.time)
+
     pygame.display.flip()
+    #if self.info_tile:
+    #  self.saved = self.window.copy()
+    #  self.drawTime(self.time)
+    #  pygame.display.flip()
     data_struct = {'state': 'play'}
     return(data_struct)
 
@@ -181,6 +191,9 @@ class Game(NetworkGame):
         pygame.display.flip()
       time.sleep(.1)
 
+
+    if hasattr(self, 'saved'):
+      del self.saved
     self.window.blit(self.background, self.backPos)
     if self.score_tile:
       font = pygame.font.Font(None, SCORE_SIZE * self.SCALE)
@@ -196,18 +209,13 @@ class Game(NetworkGame):
       self.window.blit(text, textpos)
     if self.info_tile:
       font = pygame.font.Font(None, INFO_SIZE * self.SCALE)
-      el_time = str(data['time'])
-      el_time = font.render(el_time, 1, (0, 0, 255))
-      el_timepos = el_time.get_rect()
-      el_timepos.centerx = self.window.get_width()/2 
-      el_timepos.centery = self.window.get_height()/2 - (INFO_SIZE * self.SCALE)
       msg = str(data['msg'])
       msg = font.render(msg, 1, (0, 0, 255))
       msgpos = msg.get_rect()
       msgpos.centerx = self.window.get_width()/2 
       msgpos.centery = self.window.get_height()/2 + (INFO_SIZE * self.SCALE)
       self.window.blit(msg, msgpos)
-      self.window.blit(el_time, el_timepos)
+      self.drawTime(str(data['time']))
     pygame.display.flip()
 
     self.loc = []
@@ -225,12 +233,25 @@ class Game(NetworkGame):
 
     return  {'state': 'play'}  
 
+  def drawTime(self, el_time):
+    font = pygame.font.Font(None, INFO_SIZE * self.SCALE)
+    el_time = font.render(str(el_time), 1, (0, 0, 255))
+    el_timepos = el_time.get_rect()
+    el_timepos.centerx = self.window.get_width()/2 
+    el_timepos.centery = self.window.get_height()/2 - (INFO_SIZE * self.SCALE)
+    self.window.blit(el_time, el_timepos)
+      
+
   def game_over(self, data):
     # self.window.fill((0,0,0))
     self.window.blit(self.background, self.backPos)
     if self.score_tile:
       font = pygame.font.Font(None, SCORE_SIZE * self.SCALE)
       score = str(data['score'][self.player_score])
+      if self.player_score == 'p1':
+        color = 0, 0, 255
+      else:
+        color = 255, 0, 0
       text = font.render(score, 1, (0, 0, 255))
       textpos = text.get_rect()
       textpos.centerx = self.window.get_width()/2
@@ -257,11 +278,22 @@ class Game(NetworkGame):
 
   def loc_collision(self, loc, bike):
     if loc[bike.location[0]][bike.location[1]] == 1:
-      print "location already occupied at " + str(bike.location[0]) + " " + str(bike.location[1])
-
       return True
     else:
       return False
+
+  def draw_scrap(self, location, image):
+    if not self.info_tile:# or self.time == -1:
+      self.originalDraw(location, image)
+    else:
+      self.newDraw(location, image)
+
+  def newDraw(self, location, image):
+    if hasattr(self, 'saved'):
+      self.window.blit(self.saved, self.backPos)
+    self.originalDraw(location, image)
+    self.saved = self.window.copy()
+
 
   def draw(self, location, image):
     """draws the image at the location, properly scaled from the grid space,
@@ -289,3 +321,4 @@ class Game(NetworkGame):
         # print "player 1 trans at " + str(translated_pos_1)
     else: translated_pos = 0
     return translated_pos #, translated_pos_2)
+

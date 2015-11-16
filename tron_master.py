@@ -97,30 +97,35 @@ class MasterTron(object):
     self.el_time = 0
     self.current_level = 1
 
-
   def run(self):
     """loop to run the game and decide which state the game is in and call the 
     functions accordingly""" 
     data = ''
+
     while True:
-      if self.state == 'play':
-        data, self.state = self.play_frame()
-      elif self.state == 'win':
-        # need to send win signal, reset locations and pause 
-        self.win_signal(data)
-      elif self.state == 'draw':
-        self.win_signal(data)
-      elif self.state == 'over':
-        self.game_over_signal(data)
-      self.el_time += FPS.tick(LEVELS[self.current_level][1])
-      # print self.el_time
-      # print LEVELS[self.current_level][0]
-      if self.el_time > LEVELS[self.current_level][0]:
-        if self.current_level == len(LEVELS):
-          print "exiting at " + str(self.el_time)
-          print "current level is " + str(self.current_level)
-          self.state = 'over'
-        self.current_level += 1
+      try:
+        if self.state == 'play':
+          data, self.state = self.play_frame()
+        elif self.state == 'win':
+          # need to send win signal, reset locations and pause 
+          self.win_signal(data)
+        elif self.state == 'draw':
+          self.win_signal(data)
+        elif self.state == 'over':
+          self.game_over_signal(data)
+        self.el_time += FPS.tick(LEVELS[self.current_level][1])
+        # print self.el_time
+        # print LEVELS[self.current_level][0]
+        if self.el_time > LEVELS[self.current_level][0]:
+          if self.current_level == len(LEVELS):
+            print "exiting at " + str(self.el_time)
+            print "current level is " + str(self.current_level)
+            self.state = 'over'
+          self.current_level += 1
+      except KeyboardInterrupt:
+        self.close_sockets(self.sock_list)
+        sys.exit()
+
 
   def play_frame(self):
     events = pygame.event.get()
@@ -151,7 +156,8 @@ class MasterTron(object):
                 'player2_images':player2_image_dict,
                 'player1_locs':[self.player1.location, self.last_loc_1[0], self.last_2_loc_1[0]],
                 'player2_locs':[self.player2.location, self.last_loc_2[0], self.last_2_loc_2[0]],
-                'state': 'play'}
+                'state': 'play',
+                'time': self.getRealTime('play')}
 
     data = cPickle.dumps(send_struct, cPickle.HIGHEST_PROTOCOL) + '*ET*'
 
@@ -169,7 +175,6 @@ class MasterTron(object):
         self.explode.play(loops = 0, maxtime = 0, fade_ms = 0)
         if data['state'] == 'draw':
           # draw happend on the same screen
-          print 'drew'
           return data, 'draw'
         if data['state'] == 'win':
           num_of_wins += 1
@@ -177,7 +182,7 @@ class MasterTron(object):
           # return (data, 'win')
     if num_of_wins > 1:
       pprint(return_list)
-      print "NUM OF WINS IS LARGER THAN 1"
+      #print "NUM OF WINS IS LARGER THAN 1"
       return win_states, 'draw'
     elif num_of_wins == 1:
       return (win_states[0], 'win')
@@ -208,6 +213,17 @@ class MasterTron(object):
       flipy = True
     return flipx, flipy
 
+  def getRealTime(self, state):
+    minutes, milliseconds = divmod(self.el_time, 60000)
+    seconds = float(milliseconds) / 1000
+    real_minutes = 3 - minutes
+    real_seconds = 60 - seconds
+    real_time = "%02i:%02.0f" % (real_minutes, real_seconds)
+    if state == 'win' or (real_minutes == 0 and real_seconds < 11):
+      return real_time
+    else:
+      return -1
+
   def win_signal(self, data):
     """players scored, increment the score and send the win signal to all the nodes
     """
@@ -228,7 +244,6 @@ class MasterTron(object):
 
     else:
       # it's a list of states so there was a draw
-      print 'this'
       msg = 'DRAW!'
       if type(data) is not list:
         data = [data]
@@ -244,7 +259,7 @@ class MasterTron(object):
     real_time = "%02i:%02.0f" % (real_minutes, real_seconds)
     send_struct = {'state': 'win', 'death_loc':explod_loc_list,
                    'score':{'p1':self.player1.score, 'p2':self.player2.score},
-                   'time':real_time, 'msg':msg}
+                   'time': self.getRealTime('win'), 'msg':msg}
     #send to worker nodes
     data = cPickle.dumps(send_struct, cPickle.HIGHEST_PROTOCOL) + SOCKET_DEL 
     for s in self.sock_list:
