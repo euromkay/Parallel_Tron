@@ -151,7 +151,8 @@ class MasterTron(object):
                 'player2_images':player2_image_dict,
                 'player1_locs':[self.player1.location, self.last_loc_1[0], self.last_2_loc_1[0]],
                 'player2_locs':[self.player2.location, self.last_loc_2[0], self.last_2_loc_2[0]],
-                'state': 'play'}
+                'state': 'play',
+                'time': self.getRealTime('play')}
 
     data = cPickle.dumps(send_struct, cPickle.HIGHEST_PROTOCOL) + '*ET*'
 
@@ -208,6 +209,20 @@ class MasterTron(object):
       flipy = True
     return flipx, flipy
 
+  def getRealTime(self, state):
+    # the_time = LEVEL_TIMES[-1]- self.el_time
+    minutes, milliseconds = divmod(self.el_time, 60000)
+    seconds = float(milliseconds) / 1000
+    real_minutes = 3 - minutes
+    real_seconds = 60 - seconds
+    if state == 'win':
+      return "%02i:%02.0f" % (real_minutes, real_seconds)    
+    #for sure a play state now
+    if real_minutes == 0 and real_seconds < 11:
+      return "%02i:%02.0f" % (real_minutes, real_seconds)    
+    return -1
+
+
   def win_signal(self, data):
     """players scored, increment the score and send the win signal to all the nodes
     """
@@ -236,15 +251,10 @@ class MasterTron(object):
         for loc in x['death_loc']:
           explod_loc_list.append(self.convert_to_global(x['tile'],loc))
 
-    # the_time = LEVEL_TIMES[-1]- self.el_time
-    minutes, milliseconds = divmod(self.el_time, 60000)
-    seconds = float(milliseconds) / 1000
-    real_minutes = 3 - minutes
-    real_seconds = 60 - seconds
-    real_time = "%02i:%02.0f" % (real_minutes, real_seconds)
+
     send_struct = {'state': 'win', 'death_loc':explod_loc_list,
                    'score':{'p1':self.player1.score, 'p2':self.player2.score},
-                   'time':real_time, 'msg':msg}
+                   'time': self.getRealTime('win'), 'msg':msg}
     #send to worker nodes
     data = cPickle.dumps(send_struct, cPickle.HIGHEST_PROTOCOL) + SOCKET_DEL 
     for s in self.sock_list:

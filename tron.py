@@ -59,6 +59,8 @@ class Game(NetworkGame):
     self.background = pygame.image.load(image_path)
     self.background = pygame.transform.scale(self.background, SIZE)
     self.background = self.background.convert()
+    self.saved = pygame.Surface(SIZE)
+    self.saved.set_alpha(0)
     self.backPos = pygame.Rect((0, 0), (0, 0))
     self.window.blit(self.background, self.backPos)
     self.p1_death_loc = [0,0]
@@ -84,6 +86,8 @@ class Game(NetworkGame):
     head_pos_2 = self.translate_position(data['player2_locs'][0])
     player1hit = False
     player2hit = False
+
+    self.time = str(data['time'])
 
     if head_pos_1 == head_pos_2 and head_pos_1 != 0:
       self.player2.location = head_pos_2
@@ -159,9 +163,28 @@ class Game(NetworkGame):
       if temp != 0 and data['player2_images'][idx] != 'corner':
         self.draw(temp, self.image_dict[data['player2_images'][idx]]) 
 
+    if self.info_tile:
+      self.displayTime(str(data['time']), True)
+
+
     pygame.display.flip()
     data_struct = {'state': 'play'}
     return(data_struct)
+
+  def displayTime(self, el_time, lightShaded):
+    if lightShaded:
+      alpha = 0
+    else:
+      alpha = 255
+    #print alpha
+    font = pygame.font.Font(None, INFO_SIZE * self.SCALE)
+    el_time = font.render(el_time, 1, (0, 255, 0, alpha))
+    el_timepos = el_time.get_rect()
+    el_timepos.centerx = self.window.get_width()/2 
+    el_timepos.centery = self.window.get_height()/2 - (INFO_SIZE * self.SCALE)
+    self.window.blit(self.saved, self.backPos)
+    self.window.blit(el_time, el_timepos)
+      
 
   def win_state(self, data):
     # self.window.fill((0,0,0))
@@ -181,6 +204,7 @@ class Game(NetworkGame):
         pygame.display.flip()
       time.sleep(.1)
 
+    self.saved = self.background.copy()
     self.window.blit(self.background, self.backPos)
     if self.score_tile:
       font = pygame.font.Font(None, SCORE_SIZE * self.SCALE)
@@ -196,18 +220,13 @@ class Game(NetworkGame):
       self.window.blit(text, textpos)
     if self.info_tile:
       font = pygame.font.Font(None, INFO_SIZE * self.SCALE)
-      el_time = str(data['time'])
-      el_time = font.render(el_time, 1, (0, 0, 255))
-      el_timepos = el_time.get_rect()
-      el_timepos.centerx = self.window.get_width()/2 
-      el_timepos.centery = self.window.get_height()/2 - (INFO_SIZE * self.SCALE)
       msg = str(data['msg'])
       msg = font.render(msg, 1, (0, 0, 255))
       msgpos = msg.get_rect()
       msgpos.centerx = self.window.get_width()/2 
       msgpos.centery = self.window.get_height()/2 + (INFO_SIZE * self.SCALE)
       self.window.blit(msg, msgpos)
-      self.window.blit(el_time, el_timepos)
+      self.displayTime(str(data['time']), False)
     pygame.display.flip()
 
     self.loc = []
@@ -228,6 +247,7 @@ class Game(NetworkGame):
   def game_over(self, data):
     # self.window.fill((0,0,0))
     self.window.blit(self.background, self.backPos)
+    self.saved = self.background.copy()
     if self.score_tile:
       font = pygame.font.Font(None, SCORE_SIZE * self.SCALE)
       score = str(data['score'][self.player_score])
@@ -257,25 +277,32 @@ class Game(NetworkGame):
 
   def loc_collision(self, loc, bike):
     if loc[bike.location[0]][bike.location[1]] == 1:
-      print "location already occupied at " + str(bike.location[0]) + " " + str(bike.location[1])
-
       return True
     else:
       return False
 
   def draw(self, location, image):
+    self.originalDraw(location, image)
+    return
     """draws the image at the location, properly scaled from the grid space,
     draws a black square first where it will be drawn"""
     x_cor = location[0]*self.SCALE
     y_cor = location[1]*self.SCALE
     if not (x_cor > 1920 or y_cor > 1200):
-      self.window.blit(self.background, (x_cor, y_cor),
-        pygame.Rect(x_cor, y_cor, self.SCALE, self.SCALE))
+      #self.saved.blit(self.background, (x_cor, y_cor), pygame.Rect(x_cor, y_cor, self.SCALE, self.SCALE))
       # pygame.draw.rect(self.window, (0,0,0), 
       #                     (location[0]*self.SCALE, 
       #                     location[1]*self.SCALE, 
       #                     self.SCALE, self.SCALE))
-      self.window.blit(image, (location[0]*self.SCALE, location[1]*self.SCALE))
+      self.saved.blit(image, (location[0]*self.SCALE, location[1]*self.SCALE))
+      self.window.blit(self.saved, self.backPos)
+
+  def originalDraw(self, location, image):
+    x_cor = location[0]*self.SCALE
+    y_cor = location[1]*self.SCALE
+    self.window.blit(self.background, (x_cor, y_cor),
+      pygame.Rect(x_cor, y_cor, self.SCALE, self.SCALE))
+    self.window.blit(image, (location[0]*self.SCALE, location[1] * self.SCALE))
 
   def translate_position(self, pos):
     """tanslates the entire game board to the local one"""
