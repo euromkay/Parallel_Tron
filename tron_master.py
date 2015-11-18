@@ -6,7 +6,7 @@ import cPickle, time
 from pprint import pprint
 from helper import draw_logic, load_images, construct_list
 import sound as sound
-
+from config import config
 
 MONITOR_GRIDX = 5 # width 
 MONITOR_GRIDY = 3 # height
@@ -130,8 +130,12 @@ class MasterTron(object):
   def play_frame(self):
     events = pygame.event.get()
 
-    self.handle_key_press(events)
-    self.handle_joy_stick(events)
+    if config['ai']:
+      self.handle_key_press(events)
+      self.handle_joy_stick(events)
+    else:
+      self.handle_key_press(events)
+      self.handle_joy_stick(events)
 
     self.last_2_loc_1 = self.last_loc_1[:]
     self.last_loc_1[0] = [self.player1.location[0], self.player1.location[1]]
@@ -232,10 +236,10 @@ class MasterTron(object):
       # not a draw, check who won then.
       if data['which'] == 1:
         self.player1.score += 1
-        msg = 'player 1 Scored'
+        msg = 'Player 1 Scored'
       else:
         self.player2.score += 1
-        msg = 'player 2 Scored'
+        msg = 'Player 2 Scored'
 
       for loc in data['death_loc']:
         # print "BEFORE CONVERTING" + str(loc)
@@ -284,12 +288,14 @@ class MasterTron(object):
     reset = False
     #self.update_score_file()
 
+    time.sleep(5)
+
     # wait for rest key. TODO, add a kill key
-    while not reset:
-      for event in pygame.event.get():
-        if event.type == KEYDOWN:
-          if event.key == K_4:
-            reset = True
+    #while not reset:
+    #  for event in pygame.event.get():
+    #    if event.type == KEYDOWN:
+    #      if event.key == K_4:
+    #        reset = True
     self.init_locations()
     self.player1.score = 0
     self.player2.score = 0
@@ -393,8 +399,6 @@ class MasterTron(object):
             sound.play(self.downSound, self.player2)
         # if event.key == K_2:
           # self.close_sockets(self.sock_list)
-        if event.key == K_4:
-          self.game_over_signal('not_used')
 
   def handle_key_press(self, events):
     """handles the pygame keyboard events."""
@@ -413,41 +417,49 @@ class MasterTron(object):
             self.player1.moveleft()
             self.player1.dir = 'left'
             p1_moved = True
+            sound.play(self.leftSound, self.player1)
         if event.key == K_x and self.player1.dir != 'right' and not p1_moved:
           if self.player1.dir != 'left':
             self.player1.moveright()
             self.player1.dir = 'right'
             p1_moved = True
+            sound.play(self.rightSound, self.player1)
         if event.key == K_LALT and self.player1.dir != 'up' and not p1_moved:
           if self.player1.dir != 'down':
             self.player1.moveup()
             self.player1.dir = 'up'
             p1_moved = True
+            sound.play(self.upSound, self.player1)
         if event.key == K_z and self.player1.dir != 'down' and not p1_moved:
           if self.player1.dir != 'up':
             self.player1.movedown()
             self.player1.dir = 'down'
             p1_moved = True
+            sound.play(self.downSound, self.player1)
         if event.key == K_w and self.player2.dir != 'left' and not p2_moved:
           if self.player2.dir != 'right':
             self.player2.moveleft()
             self.player2.dir = 'left'
             p2_moved = True
+            sound.play(self.leftSound, self.player2)
         if event.key == K_LEFTBRACKET and self.player2.dir != 'right' and not p2_moved:
           if self.player2.dir != 'left':
             self.player2.moveright()
             self.player2.dir = 'right'
             p2_moved = True
+            sound.play(self.rightSound, self.player2)
         if event.key == K_s and self.player2.dir != 'up' and not p2_moved:
           if self.player2.dir != 'down':
             self.player2.moveup()
             self.player2.dir = 'up'
             p2_moved = True
+            sound.play(self.upSound, self.player2)
         if event.key == K_e and self.player2.dir != 'down' and not p2_moved:
           if self.player2.dir != 'up':
             self.player2.movedown()
             self.player2.dir = 'down'
             p2_moved = True
+            sound.play(self.downSound, self.player2)
 
   def get_whole_packet(self, socket):
     """ensures that we receive the whole stream of data"""

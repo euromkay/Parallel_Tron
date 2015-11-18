@@ -210,7 +210,13 @@ class Game(NetworkGame):
     if self.info_tile:
       font = pygame.font.Font(None, INFO_SIZE * self.SCALE)
       msg = str(data['msg'])
-      msg = font.render(msg, 1, (0, 0, 255))
+      if msg == 'Player 1 Scored':
+        color = (0, 0, 255)
+      elif msg == 'Player 2 Scored':
+        color = (255, 0, 0)
+      else:
+        color = (255, 255, 255)
+      msg = font.render(msg, 1, color)
       msgpos = msg.get_rect()
       msgpos.centerx = self.window.get_width()/2 
       msgpos.centery = self.window.get_height()/2 + (INFO_SIZE * self.SCALE)
@@ -235,7 +241,7 @@ class Game(NetworkGame):
 
   def drawTime(self, el_time):
     font = pygame.font.Font(None, INFO_SIZE * self.SCALE)
-    el_time = font.render(str(el_time), 1, (0, 0, 255))
+    el_time = font.render(str(el_time), 1, (255, 255, 255))
     el_timepos = el_time.get_rect()
     el_timepos.centerx = self.window.get_width()/2 
     el_timepos.centery = self.window.get_height()/2 - (INFO_SIZE * self.SCALE)
@@ -252,7 +258,7 @@ class Game(NetworkGame):
         color = 0, 0, 255
       else:
         color = 255, 0, 0
-      text = font.render(score, 1, (0, 0, 255))
+      text = font.render(score, 1, color)
       textpos = text.get_rect()
       textpos.centerx = self.window.get_width()/2
       textpos.centery = self.window.get_height()/2 
