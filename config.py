@@ -1,5 +1,6 @@
 import pygame
 
 config = {
-	'ai' : True
+	'ai' : True,
+	'scale': 11
 }

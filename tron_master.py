@@ -7,6 +7,7 @@ from pprint import pprint
 from helper import draw_logic, load_images, construct_list
 import sound as sound
 from config import config
+import random
 
 MONITOR_GRIDX = 5 # width 
 MONITOR_GRIDY = 3 # height
@@ -38,23 +39,33 @@ class LightBike():
     self.velocity = startvel[:]
     self.orientation = start_orient
     self.score = 0
-    self.dir = start_dir
+    self.moved = False
 
-  def movedown(self):
-    self.velocity[0] = 0
-    self.velocity[1] = 1
-  def moveup(self):
-    self.velocity[0] = 0
-    self.velocity[1] = -1
-  def moveleft(self):
-    self.velocity[0] = -1
-    self.velocity[1] = 0
-  def moveright(self):
-    self.velocity[0] = 1
-    self.velocity[1] = 0
+  def movedown(self, game):
+    self.move((0,1), game.downSound)
+  def moveup(self, game):
+    self.move((0,-1), game.upSound)
+  def moveleft(self, game):
+    self.move((-1, 0), game.leftSound)
+  def moveright(self, game):
+    self.move((1,0), game.rightSound)
+  def noMove(self, game):
+    pass
+
+  def move(self, vel, playerSound):
+    if self.moved:
+      return
+    #if the input is the same as before, or completely opposite
+    if self.velocity[0] == vel or (self.velocity[0] * -1 == vel[0] and self.velocity[1] == vel[1]):
+      return
+    sound.play(playerSound, self)
+    self.velocity = vel
+    self.moved = True
+
   def update(self): 
     self.location[0] += self.velocity[0]
-    self.location[1] += self.velocity[1] 
+    self.location[1] += self.velocity[1]
+    self.moved = False
 
 class MasterTron(object):
   """The class for the MasterTron node"""
@@ -131,11 +142,9 @@ class MasterTron(object):
     events = pygame.event.get()
 
     if config['ai']:
-      self.handle_key_press(events)
-      self.handle_joy_stick(events)
+      self.ai(events)
     else:
-      self.handle_key_press(events)
-      self.handle_joy_stick(events)
+      self.handle_input(events)
 
     self.last_2_loc_1 = self.last_loc_1[:]
     self.last_loc_1[0] = [self.player1.location[0], self.player1.location[1]]
@@ -288,14 +297,14 @@ class MasterTron(object):
     reset = False
     #self.update_score_file()
 
-    time.sleep(5)
 
     # wait for rest key. TODO, add a kill key
-    #while not reset:
-    #  for event in pygame.event.get():
-    #    if event.type == KEYDOWN:
-    #      if event.key == K_4:
-    #        reset = True
+    while not reset:
+      for event in pygame.event.get():
+        if event.type == KEYDOWN:
+          if event.key == K_4:
+            reset = True
+            break
     self.init_locations()
     self.player1.score = 0
     self.player2.score = 0
@@ -339,66 +348,78 @@ class MasterTron(object):
       return_list.append(self.get_whole_packet(s))
     return return_list
 
-  def handle_joy_stick(self, events):
+  def handle_input(self, events):
     """handles the pygame keyboard events."""
     # bug that you can go back on yourself if you register a lot of button presses
-    p1_moved = False
-    p2_moved = False
+    pressDict = {}
+    pressDict[K_KP4] = self.player1.moveleft
+    pressDict[K_KP6] = self.player1.moveright
+    pressDict[K_KP8] = self.player1.moveup
+    pressDict[K_KP2] = self.player1.movedown
+    pressDict[K_d]   = self.player2.moveleft
+    pressDict[K_g]   = self.player2.moveright
+    pressDict[K_r]   = self.player2.moveup
+    pressDict[K_f]   = self.player2.movedown
+    pressDict[K_LSHIFT] = self.player1.moveleft
+    pressDict[K_x]   = self.player1.moveright
+    pressDict[K_LALT] = self.player1.moveup
+    pressDict[K_z]    = self.player1.movedown
+    pressDict[K_w]    = self.player2.moveleft
+    pressDict[K_LEFTBRACKET] = self.player2.moveright
+    pressDict[K_s]    = self.player2.moveup
+    pressDict[K_e]    = self.player2.movedown
+
     for event in events:
       if event.type == pygame.QUIT:
           sys.exit()
       if event.type == KEYDOWN:
         # check if trying to go back on themselves
-        if event.key == K_KP4 and self.player1.dir != 'left' and not p1_moved:
-          if self.player1.dir != 'right':
-            self.player1.moveleft()
-            self.player1.dir = 'left'
-            p1_moved = True
-            sound.play(self.leftSound, self.player1)
-        if event.key == K_KP6 and self.player1.dir != 'right' and not p1_moved:
-          if self.player1.dir != 'left':
-            self.player1.moveright()
-            self.player1.dir = 'right'
-            p1_moved = True
-            sound.play(self.rightSound, self.player1)
-        if event.key == K_KP8 and self.player1.dir != 'up' and not p1_moved:
-          if self.player1.dir != 'down':
-            self.player1.moveup()
-            self.player1.dir = 'up'
-            p1_moved = True
-            sound.play(self.upSound, self.player1)
-        if event.key == K_KP2 and self.player1.dir != 'down' and not p1_moved:
-          if self.player1.dir != 'up':
-            self.player1.movedown()
-            self.player1.dir = 'down'
-            p1_moved = True
-            sound.play(self.downSound, self.player1)
-        if event.key == K_d and self.player2.dir != 'left' and not p2_moved:
-          if self.player2.dir != 'right':
-            self.player2.moveleft()
-            self.player2.dir = 'left'
-            p2_moved = True
-            sound.play(self.leftSound, self.player2)
-        if event.key == K_g and self.player2.dir != 'right' and not p2_moved:
-          if self.player2.dir != 'left':
-            self.player2.moveright()
-            self.player2.dir = 'right'
-            p2_moved = True
-            sound.play(self.rightSound, self.player2)
-        if event.key == K_r and self.player2.dir != 'up' and not p2_moved:
-          if self.player2.dir != 'down':
-            self.player2.moveup()
-            self.player2.dir = 'up'
-            p2_moved = True
-            sound.play(self.upSound, self.player2)
-        if event.key == K_f and self.player2.dir != 'down' and not p2_moved:
-          if self.player2.dir != 'up':
-            self.player2.movedown()
-            self.player2.dir = 'down'
-            p2_moved = True
-            sound.play(self.downSound, self.player2)
+        if event.key in pressDict:
+          pressDict[event.key](self)
+        
         # if event.key == K_2:
           # self.close_sockets(self.sock_list)
+
+  def free(self, choice):
+    choiceX = choice[0]
+    choiceY = choice[1]
+    if choiceX >= FULL_GRID_SIZE[0]:
+      choiceX = 0
+    elif choiceX < 0:
+      choiceX = FULL_GRID_SIZE[0] - 1
+    if choiceY >= FULL_GRID_SIZE[1]:
+      choiceY = 0
+    elif choiceY < 0:
+      choiceY = FULL_GRID_SIZE[1] - 1
+    return self.location[choiceX][choiceY] == 0
+
+  
+
+  def ai(self, events):
+    for p in [self.player1,self.player2]:
+      #traveling left to right
+      choices = []
+      if p.velocity[0] != 0:
+        choice1   = p.location[0], p.location[1] - 1, p.moveup
+        choice2   = p.location[0], p.location[1] + 1, p.movedown
+      else:
+        choice1  = p.location[0] - 1, p.location[1], p.moveleft
+        choice2  = p.location[0] + 1, p.location[1], p.moveright
+      if self.free(choice1):
+        choices.append(choice1)
+      if self.free(choice2):
+        choices.append(choice2)
+
+      if len(choices) == 0: #nothing you can do
+        continue
+      choice3 = p.location[0] + p.velocity[0], p.location[1] + p.velocity[1], p.noMove
+      if self.free(choice3):
+        for i in range(50):
+          choices.append(choice3)
+      random.choice(choices)[2](self)
+      
+      
+        #need to move
 
   def handle_key_press(self, events):
     """handles the pygame keyboard events."""

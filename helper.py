@@ -2,6 +2,9 @@
 
 #Load images method from the master file put here
 import pygame
+from config import config
+
+scale = config['scale']
 
 def load_images():
   image_dict = {}
@@ -46,6 +49,12 @@ def load_images():
   image_dict['explode2'] = pygame.image.load('assets/explosion_512.png').convert_alpha()
   image_dict['explode3'] = pygame.image.load('assets/explosion_1024a.png').convert_alpha()
   image_dict['explode4'] = pygame.image.load('assets/explosion_1024b.png').convert_alpha()
+  for k in image_dict.keys():
+    rect = image_dict[k].get_rect()
+    width = rect.width * scale/ 30
+    height = rect.height * scale / 30
+    image_dict[k] = pygame.transform.scale(image_dict[k], (width, height))
+
   return image_dict
 
 
@@ -104,7 +113,6 @@ def draw_logic(last_2_loc, last_loc, player, flipx, flipy, which):
     if (player.location[0] == last_loc[0][0] and player.location[0] > last_2_loc[0][0]
       and player.location[1] > last_loc[0][1] and player.location[1] > last_2_loc[0][1]):
       #upper right, going down
-      print 'asdkltsda'
       if flipy or flipx:
         print "FLIPING!"
         image_key_list = construct_list(last_2_loc, last_loc, which + '_hd_dn', which + '_co_ll', which + '_tl_hor')
