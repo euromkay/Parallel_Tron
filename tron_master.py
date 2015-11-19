@@ -56,7 +56,12 @@ class LightBike():
     if self.moved:
       return
     #if the input is the same as before, or completely opposite
-    if self.velocity[0] == vel or (self.velocity[0] * -1 == vel[0] and self.velocity[1] == vel[1]):
+    if self.velocity == vel:
+      return
+    #if traveling horizontally and change and 
+    if self.velocity[0] != 0 and vel[0] != 0:
+      return
+    if self.velocity[1] != 0 and vel[1] != 0:
       return
     sound.play(playerSound, self)
     self.velocity = vel
@@ -72,14 +77,13 @@ class MasterTron(object):
   def __init__(self, ip, port):
     pygame.mixer.pre_init(channels=2, buffer=512)
     pygame.init()
-    self.player1 = LightBike(PLAYER1_START, 'hor', [1,0], 'left' )
-    self.player2 = LightBike(PLAYER2_START, 'hor', [-1,0], 'right' )
-    #self.new_game_score()
-    self.init_locations()
     self.window = pygame.display.set_mode((200,200))
     self.image_dict = load_images()
     self.sock_list = []#[ [] for y in range(MONITOR_GRIDY)] for x in range(MONITOR_GRIDX)]
 
+    self.pause = False
+    self.quitting = False
+    self.running = True
 
     self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     self.socket.bind((ip, port))
@@ -103,15 +107,22 @@ class MasterTron(object):
     cycle = self.mixer.Sound(direc+'assets/cycle.wav')
     cycle.play(loops = -1, maxtime = 0, fade_ms = 0)
 
-    self.fliped_1x, self.fliped_1y, self.fliped_2x, self.fliped_2y = 4*[False]
-    self.flip_1x, self.flip_1y, self.flip_2x, self.flip_2y = 4*[False]
-    self.el_time = 0
-    self.current_level = 1
+    
 
   def run(self):
     """loop to run the game and decide which state the game is in and call the 
     functions accordingly""" 
     data = ''
+
+    self.player1 = LightBike(PLAYER1_START, 'hor', [1,0], 'left' )
+    self.player2 = LightBike(PLAYER2_START, 'hor', [-1,0], 'right' )
+    #self.new_game_score()
+    self.init_locations()
+    self.fliped_1x, self.fliped_1y, self.fliped_2x, self.fliped_2y = 4*[False]
+    self.flip_1x, self.flip_1y, self.flip_2x, self.flip_2y = 4*[False]
+    self.el_time = 0
+    self.current_level = 1
+    self.running = True
 
     while True:
       try:
@@ -133,18 +144,19 @@ class MasterTron(object):
             print "current level is " + str(self.current_level)
             self.state = 'over'
           self.current_level += 1
+        if not self.running:
+          return
       except KeyboardInterrupt:
         self.close_sockets(self.sock_list)
         sys.exit()
 
 
   def play_frame(self):
-    events = pygame.event.get()
 
-    if config['ai']:
-      self.ai(events)
-    else:
-      self.handle_input(events)
+    while True:
+      self.handle_input(pygame.event.get())
+      if not self.pause or self.quitting or not self.running:
+        break
 
     self.last_2_loc_1 = self.last_loc_1[:]
     self.last_loc_1[0] = [self.player1.location[0], self.player1.location[1]]
@@ -299,12 +311,11 @@ class MasterTron(object):
 
 
     # wait for rest key. TODO, add a kill key
-    while not reset:
+    while not reset and not config['ai1'] and not config['ai2']:
       for event in pygame.event.get():
         if event.type == KEYDOWN:
           if event.key == K_4:
             reset = True
-            break
     self.init_locations()
     self.player1.score = 0
     self.player2.score = 0
@@ -324,7 +335,7 @@ class MasterTron(object):
     #score_file = open('scores.txt', 'a')
     #last_line = 'player1 = 0 player2 = 0\n'
     #score_file.write(last_line)
-    #score_file.close()
+    #score_filexit.close()
 
   #def update_score_file(self):
     #"""overwrites the last line of the score file with the changed scores"""
@@ -351,34 +362,70 @@ class MasterTron(object):
   def handle_input(self, events):
     """handles the pygame keyboard events."""
     # bug that you can go back on yourself if you register a lot of button presses
-    pressDict = {}
-    pressDict[K_KP4] = self.player1.moveleft
-    pressDict[K_KP6] = self.player1.moveright
-    pressDict[K_KP8] = self.player1.moveup
-    pressDict[K_KP2] = self.player1.movedown
-    pressDict[K_d]   = self.player2.moveleft
-    pressDict[K_g]   = self.player2.moveright
-    pressDict[K_r]   = self.player2.moveup
-    pressDict[K_f]   = self.player2.movedown
-    pressDict[K_LSHIFT] = self.player1.moveleft
-    pressDict[K_x]   = self.player1.moveright
-    pressDict[K_LALT] = self.player1.moveup
-    pressDict[K_z]    = self.player1.movedown
-    pressDict[K_w]    = self.player2.moveleft
-    pressDict[K_LEFTBRACKET] = self.player2.moveright
-    pressDict[K_s]    = self.player2.moveup
-    pressDict[K_e]    = self.player2.movedown
+    pressDict1 = {}
+    pressDict1[K_KP4]    = self.player1.moveleft
+    pressDict1[K_LSHIFT] = self.player1.moveleft
+    pressDict1[K_x]      = self.player1.moveright
+    pressDict1[K_KP6]    = self.player1.moveright
+    pressDict1[K_KP8]    = self.player1.moveup
+    pressDict1[K_LALT]   = self.player1.moveup
+    pressDict1[K_z]      = self.player1.movedown
+    pressDict1[K_KP2]    = self.player1.movedown
+
+    pressDict2 = {}
+    pressDict2[K_d]           = self.player2.moveleft
+    pressDict2[K_w]           = self.player2.moveleft
+    pressDict2[K_g]           = self.player2.moveright
+    pressDict2[K_LEFTBRACKET] = self.player2.moveright
+    pressDict2[K_f]           = self.player2.movedown
+    pressDict2[K_r]           = self.player2.moveup
+    pressDict2[K_s]           = self.player2.moveup
+    pressDict2[K_e]           = self.player2.movedown
+
 
     for event in events:
       if event.type == pygame.QUIT:
-          sys.exit()
+          self.quitting = True
+          self.running = False
       if event.type == KEYDOWN:
         # check if trying to go back on themselves
-        if event.key in pressDict:
-          pressDict[event.key](self)
-        
+        if event.key in pressDict1 and not config['ai1']:
+          pressDict1[event.key](self)
+        if event.key in pressDict2 and not config['ai2']:
+          pressDict2[event.key](self)
+        if event.key == K_1:
+          if config['ai1'] == config['ai2']:
+            config['ai1'] = False
+            config['ai2'] = True
+          else:
+            config['ai1'] = not config['ai1']
+            config['ai2'] = not config['ai2']
+        elif event.key == K_2:
+          if config['ai1'] or config['ai2']:
+            config['ai1'] = config['ai2'] = False
+          else:
+            config['ai1'] = config['ai2'] = True
+        elif event.key == K_5:
+          self.pause = not self.pause
+          pauseEvent = event
+        elif event.key == K_3:
+          self.running = False
+          self.quitting = True
+        elif event.key == K_4:
+          self.running = False
+
+          
+
+
         # if event.key == K_2:
           # self.close_sockets(self.sock_list)
+
+    
+
+    if config['ai1']:
+      self.ai(self.player1)
+    if config['ai2']:
+      self.ai(self.player2)
 
   def free(self, choice):
     choiceX = choice[0]
@@ -395,28 +442,26 @@ class MasterTron(object):
 
   
 
-  def ai(self, events):
-    for p in [self.player1,self.player2]:
-      #traveling left to right
-      choices = []
-      if p.velocity[0] != 0:
-        choice1   = p.location[0], p.location[1] - 1, p.moveup
-        choice2   = p.location[0], p.location[1] + 1, p.movedown
-      else:
-        choice1  = p.location[0] - 1, p.location[1], p.moveleft
-        choice2  = p.location[0] + 1, p.location[1], p.moveright
-      if self.free(choice1):
-        choices.append(choice1)
-      if self.free(choice2):
-        choices.append(choice2)
+  def ai(self, p):
+    choices = []
+    if p.velocity[0] != 0:
+      choice1   = p.location[0], p.location[1] - 1, p.moveup
+      choice2   = p.location[0], p.location[1] + 1, p.movedown
+    else:
+      choice1  = p.location[0] - 1, p.location[1], p.moveleft
+      choice2  = p.location[0] + 1, p.location[1], p.moveright
+    if self.free(choice1):
+      choices.append(choice1)
+    if self.free(choice2):
+      choices.append(choice2)
 
-      if len(choices) == 0: #nothing you can do
-        continue
-      choice3 = p.location[0] + p.velocity[0], p.location[1] + p.velocity[1], p.noMove
-      if self.free(choice3):
-        for i in range(50):
-          choices.append(choice3)
-      random.choice(choices)[2](self)
+    if len(choices) == 0: #nothing you can do
+      return
+    choice3 = p.location[0] + p.velocity[0], p.location[1] + p.velocity[1], p.noMove
+    if self.free(choice3):
+      for i in range(60):
+        choices.append(choice3)
+    random.choice(choices)[2](self)
       
       
         #need to move
@@ -597,5 +642,7 @@ class MasterTron(object):
   
 def start(ip, port):
   tron = MasterTron(ip, port)
-  tron.run()
-  
+  while not tron.quitting:
+    tron.run()
+  tron.close_sockets(tron.sock_list)
+  sys.exit()

@@ -1,6 +1,7 @@
 import pygame
 
 config = {
-	'ai' : True,
+	'ai1' : True,
+	'ai2' : True,
 	'scale': 11
 }
